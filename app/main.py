@@ -1,7 +1,8 @@
 import os
 
 from fastapi import FastAPI
-from mapybara.app.models import Capy
+from models import Capybara, User
+from datetime import datetime
 from typing import Optional
 from sqlmodel import SQLModel, Field
 
