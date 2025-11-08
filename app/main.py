@@ -1,6 +1,7 @@
 from fastapi import Body, FastAPI, Depends, HTTPException, Security, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlmodel import Session, select
+from sqlalchemy import desc
 from datetime import datetime, timedelta
 from contextlib import asynccontextmanager
 import asyncio
@@ -55,6 +56,37 @@ def login(user: UserLogin, session: Session = Depends(get_session)):
         raise HTTPException(status_code=401, detail="Invalid credentials")
     token = create_access_token({"sub": db_user.username})
     return {"access_token": token, "token_type": "bearer"}
+
+@app.get("/users/{username}/history")
+def get_user_history(username: str, session: Session = Depends(get_session)):
+    user = session.exec(select(User).where(User.username == username)).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    markers = session.exec(
+    select(CapybaraMarker)
+    .where(CapybaraMarker.user_id == user.id)
+    .order_by(desc(CapybaraMarker.expires_at)) # type: ignore
+).all()
+
+
+    history = []
+    for m in markers:
+        time_posted = m.expires_at - timedelta(hours=4)
+        history.append({
+            "x_coord": m.x_coord,
+            "y_coord": m.y_coord,
+            "activity": m.activity,
+            "time_posted": time_posted,
+        })
+
+    return {
+        "user": {
+            "username": user.username,
+            "instagram": user.instagram,
+        },
+        "history": history,
+    }
 
 # ----------------
 # Capybara Markers
@@ -153,23 +185,11 @@ def update_event(
     if event.user_id != current_user.id:
         raise HTTPException(status_code=403, detail="Not authorized to update this event")
     
-    if (event.location != event_update.location):
-        event.location = event_update.location
+    update_data = event_update.model_dump(exclude_unset=True)
 
-    if (event.host != event_update.host):
-        event.host = event_update.host
-
-    if (event.description != event_update.description):
-        event.description = event_update.description
-
-    if (event.time != event_update.time):
-        event.time = event_update.time
-
-    if (event.end_time != event_update.end_time):
-        event.end_time = event_update.end_time
-
-    if (event.title != event_update.title):
-        event.title = event_update.title
+    for field, value in update_data.items():
+        if getattr(event, field) != value:
+            setattr(event, field, value)
 
     session.add(event)
     session.commit()
@@ -192,9 +212,9 @@ def delete_event(
     session.commit()
     return None
 
-# -------------------------------------
-# Cleanup Task to remove Dead Capybaras
-# -------------------------------------
+# ---------------------------------------------------------
+# Cleanup Task to remove Dead Capybaras and Finished Events
+# ---------------------------------------------------------
 
 async def cleanup_task():
     """Periodically delete expired markers every 30 minutes."""
