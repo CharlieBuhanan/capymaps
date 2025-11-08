@@ -30,12 +30,14 @@ from sqlmodel import Session
 from db import init_db, get_session
 from crud import create_capy, get_active_capys, delete_capy
 from models import Capy, CapyCreate
+from contextlib import asynccontextmanager
 
-app = FastAPI(title="Campus Capy Map 🐹")
+app = FastAPI(title="Mapybara")
 
-@app.on_event("startup")
-def on_startup():
+@asynccontextmanager
+async def on_startup():
     init_db()
+    yield
 
 
 @app.post("/capys/", response_model=Capy)

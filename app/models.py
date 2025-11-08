@@ -29,7 +29,7 @@ class Capy(SQLModel, table=True):
     activity: str
     latitude: float
     longitude: float
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     expires_at: datetime
 
     @property
