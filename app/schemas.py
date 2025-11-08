@@ -5,6 +5,7 @@ from enums import ActivityEnum
 class UserCreate(BaseModel):
     username: str
     password: str
+    instagram: str | None = None
 
 class UserLogin(BaseModel):
     username: str

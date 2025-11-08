@@ -9,7 +9,7 @@ from auth import hash_password, verify_password
 # ----------------------------
 
 def create_user(session: Session, user: UserCreate):
-    db_user = User(username=user.username, password=hash_password(user.password))
+    db_user = User(username=user.username, password=hash_password(user.password), instagram=user.instagram)
     session.add(db_user)
     session.commit()
     session.refresh(db_user)
