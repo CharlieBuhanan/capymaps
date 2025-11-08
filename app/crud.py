@@ -56,9 +56,9 @@ def create_event(session: Session, event: EventCreate, user_id: int):
     session.refresh(db_event)
     return db_event
 
-# ------------------------
-# Terminate Dead Capybaras
-# ------------------------
+# -----------------------------------
+# Terminate Dead Capybaras and Events
+# -----------------------------------
 
 def delete_expired_markers(session: Session, current_time: datetime):
     expired = session.exec(select(CapybaraMarker).where(CapybaraMarker.expires_at < current_time)).all()
@@ -66,3 +66,10 @@ def delete_expired_markers(session: Session, current_time: datetime):
         session.delete(marker)
     session.commit()
     return len(expired)
+
+def delete_finished_events(session: Session, current_time: datetime):
+    finished = session.exec(select(Event).where(Event.end_time < current_time)).all()
+    for event in finished:
+        session.delete(event)
+    session.commit()
+    return len(finished)

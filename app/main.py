@@ -15,6 +15,7 @@ from crud import (
     create_marker,
     create_event,
     delete_expired_markers,
+    delete_finished_events,
 )
 from auth import create_access_token, get_current_user
 
@@ -100,6 +101,11 @@ def update_marker(
 
     if reset_timer:
         capy.expires_at = datetime.now() + timedelta(hours=4)
+
+    session.add(capy)
+    session.commit()
+    session.refresh(capy)
+    return capy
         
 
 @app.delete("/markers/{id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -134,6 +140,42 @@ def add_event(
 def get_events(session: Session = Depends(get_session)):
     return session.exec(select(Event)).all()
 
+@app.put("/events/{id}")
+def update_event(
+    event_id: int,
+    event_update: EventCreate = Body(...),
+    session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user_from_token),
+):
+    event = session.get(Event, event_id)
+    if not event:
+        raise HTTPException(status_code=404, detail="Event not found")
+    if event.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorized to update this event")
+    
+    if (event.location != event_update.location):
+        event.location = event_update.location
+
+    if (event.host != event_update.host):
+        event.host = event_update.host
+
+    if (event.description != event_update.description):
+        event.description = event_update.description
+
+    if (event.time != event_update.time):
+        event.time = event_update.time
+
+    if (event.end_time != event_update.end_time):
+        event.end_time = event_update.end_time
+
+    if (event.title != event_update.title):
+        event.title = event_update.title
+
+    session.add(event)
+    session.commit()
+    session.refresh(event)
+    return event
+
 @app.delete("/events/{event_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_event(
     event_id: int,
@@ -160,9 +202,11 @@ async def cleanup_task():
         try:
             await asyncio.sleep(1800)  # 30 minutes
             with Session(engine) as session:
-                deleted = delete_expired_markers(session, datetime.now())
-                if deleted:
-                    logger.info(f"[Cleanup] Removed {deleted} expired capybaras at {datetime.now()}")
+                deleted_markers = delete_expired_markers(session, datetime.now())
+                deleted_events = delete_finished_events(session, datetime.now())
+                if deleted_markers or deleted_events:
+                    logger.info(f"[Cleanup] Removed {deleted_markers} expired capybaras and "
+                                f"{deleted_events} finished events at {datetime.now()}")
         except Exception as e:
             logger.error(f"[Cleanup] Error during cleanup: {e}")
 
