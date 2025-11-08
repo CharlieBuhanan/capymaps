@@ -140,7 +140,7 @@ def add_event(
 def get_events(session: Session = Depends(get_session)):
     return session.exec(select(Event)).all()
 
-@app.put("/events/{id}")
+@app.put("/events/{event_id}")
 def update_event(
     event_id: int,
     event_update: EventCreate = Body(...),
