@@ -6,6 +6,14 @@ class ActivityEnum(str, Enum):
     onMyPuter = "computer"
     finals = "finals"
     GYM = "GYM"
-    umassCapy = "umassCapy"
-    gameDayCapy = "gameDayCapy"
-    bakeSaleCapy = "bakeSaleCapy"
+    umassCapy = "umass capy"
+    gameDayCapy = "game day capy"
+    bakeSaleCapy = "bake sale capy"
+
+class LocationEnum(str, Enum):
+    library = "Library"
+    worcesterDC = "Worcester Commons"
+    theRec = "Recreation Center"
+    LGRT = "Lederle Graduate Research Tower"
+    theStu = "Student Union"
+    
