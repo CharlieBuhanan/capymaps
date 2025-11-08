@@ -1,5 +1,6 @@
 from pydantic import BaseModel, model_validator
 from datetime import datetime
+from enums import ActivityEnum
 
 class UserCreate(BaseModel):
     username: str
@@ -12,7 +13,7 @@ class UserLogin(BaseModel):
 class CapybaraMarkerCreate(BaseModel):
     x_coord: float
     y_coord: float
-    activity: str
+    activity: ActivityEnum
     duration: int
 
 class EventCreate(BaseModel):
@@ -22,6 +23,8 @@ class EventCreate(BaseModel):
     y_coord: float
     time: datetime
     end_time: datetime
+    host: str
+    location: str
 
     @model_validator(mode="after")
     def check_time(cls, values):

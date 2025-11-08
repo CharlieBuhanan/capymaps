@@ -71,7 +71,20 @@ def add_marker(
 def get_markers(session: Session = Depends(get_session)):
     return session.exec(select(CapybaraMarker)).all()
 
-
+@app.put("/markers/{id}")
+def update_marker(
+    id: int,
+    session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user_from_token),
+):
+    capy = session.get(CapybaraMarker, id)
+    if not capy:
+        raise HTTPException(status_code=404, detail="Capy not found")
+    if capy.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorized to update this capy")
+    
+    
+        
 
 @app.delete("/markers/{id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_marker(

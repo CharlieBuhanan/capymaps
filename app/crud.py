@@ -48,7 +48,9 @@ def create_event(session: Session, event: EventCreate, user_id: int):
         y_coord=event.y_coord,
         time=event.time,
         end_time=event.end_time,
-        user_id=user_id)
+        user_id=user_id,
+        host=event.host,
+        location=event.location)
     session.add(db_event)
     session.commit()
     session.refresh(db_event)
