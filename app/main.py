@@ -1,6 +1,7 @@
 from fastapi import Body, FastAPI, Depends, HTTPException, Security, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlmodel import Session, select
+from sqlalchemy import desc
 from datetime import datetime, timedelta
 from contextlib import asynccontextmanager
 import asyncio
@@ -55,6 +56,37 @@ def login(user: UserLogin, session: Session = Depends(get_session)):
         raise HTTPException(status_code=401, detail="Invalid credentials")
     token = create_access_token({"sub": db_user.username})
     return {"access_token": token, "token_type": "bearer"}
+
+@app.get("/users/{username}/history")
+def get_user_history(username: str, session: Session = Depends(get_session)):
+    user = session.exec(select(User).where(User.username == username)).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    markers = session.exec(
+    select(CapybaraMarker)
+    .where(CapybaraMarker.user_id == user.id)
+    .order_by(desc(CapybaraMarker.expires_at)) # type: ignore
+).all()
+
+
+    history = []
+    for m in markers:
+        time_posted = m.expires_at - timedelta(hours=4)
+        history.append({
+            "x_coord": m.x_coord,
+            "y_coord": m.y_coord,
+            "activity": m.activity,
+            "time_posted": time_posted,
+        })
+
+    return {
+        "user": {
+            "username": user.username,
+            "instagram": user.instagram,
+        },
+        "history": history,
+    }
 
 # ----------------
 # Capybara Markers
