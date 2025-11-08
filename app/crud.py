@@ -1,32 +1,66 @@
-from datetime import datetime, timedelta, timezone
 from sqlmodel import Session, select
-from models import Capy, CapyCreate
+from datetime import datetime, timedelta
+from models import User, CapybaraMarker, Event
+from schemas import UserCreate, CapybaraMarkerCreate, EventCreate
+from auth import hash_password, verify_password
 
-def create_capy(session: Session, capy_data: CapyCreate) -> Capy:
-    expires_at = datetime.now(timezone.utc) + timedelta(minutes=capy_data.duration_minutes)
-    capy = Capy(
-        name=capy_data.name,
-        activity=capy_data.activity,
-        latitude=capy_data.latitude,
-        longitude=capy_data.longitude,
-        expires_at=expires_at,
-    )
-    session.add(capy)
+# ----------------------------
+# User Registration and Login 
+# ----------------------------
+
+def create_user(session: Session, user: UserCreate):
+    db_user = User(username=user.username, password=hash_password(user.password))
+    session.add(db_user)
     session.commit()
-    session.refresh(capy)
-    return capy
+    session.refresh(db_user)
+    return db_user
 
-
-def get_active_capys(session: Session):
-    now = datetime.now(timezone.utc)
-    statement = select(Capy).where(Capy.expires_at > now)
-    return session.exec(statement).all()
-
-
-def delete_capy(session: Session, capy_id):
-    capy = session.get(Capy, capy_id)
-    if not capy:
+def authenticate_user(session: Session, username: str, password: str):
+    db_user = session.exec(select(User).where(User.username == username)).first()
+    if not db_user or not verify_password(password, db_user.password):
         return None
-    session.delete(capy)
+    return db_user
+
+# ----------------
+# Capybara Markers
+# ----------------
+
+def create_marker(session: Session, marker: CapybaraMarkerCreate, user_id: int):
+    expires_at = datetime.now() + timedelta(minutes=marker.duration)
+    db_marker = CapybaraMarker(x_coord=marker.x_coord,
+        y_coord=marker.y_coord,
+        activity=marker.activity,
+        user_id=user_id,
+        expires_at=expires_at)
+    session.add(db_marker)
     session.commit()
-    return True
+    session.refresh(db_marker)
+    return db_marker
+
+# --------------
+# Events Markers
+# --------------
+
+def create_event(session: Session, event: EventCreate, user_id: int):
+    db_event = Event(title=event.title,
+        description=event.description,
+        x_coord=event.x_coord,
+        y_coord=event.y_coord,
+        time=event.time,
+        end_time=event.end_time,
+        user_id=user_id)
+    session.add(db_event)
+    session.commit()
+    session.refresh(db_event)
+    return db_event
+
+# ------------------------
+# Terminate Dead Capybaras
+# ------------------------
+
+def delete_expired_markers(session: Session, current_time: datetime):
+    expired = session.exec(select(CapybaraMarker).where(CapybaraMarker.expires_at < current_time)).all()
+    for marker in expired:
+        session.delete(marker)
+    session.commit()
+    return len(expired)

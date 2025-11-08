@@ -1,34 +1,35 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, model_validator
 from datetime import datetime
 
-# Schema for Capybara (for validation and response)
-class CapybaraBase(BaseModel):
-    mood: str
-    location_lat: float
-    location_lng: float
-    expiry_time: datetime
-
-class CapybaraCreate(CapybaraBase):
-    pass
-
-class Capybara(CapybaraBase):
-    id: int
-    user_id: int
-
-    class Config:
-        orm_mode = True  # This tells Pydantic to treat ORM models like dicts
-
-# Schema for User (for validation and response)
-class UserBase(BaseModel):
+class UserCreate(BaseModel):
     username: str
-    email: str
+    password: str
 
-class UserCreate(UserBase):
-    pass
+class UserLogin(BaseModel):
+    username: str
+    password: str
 
-class User(UserBase):
-    id: int
-    created_at: datetime
+class CapybaraMarkerCreate(BaseModel):
+    x_coord: float
+    y_coord: float
+    activity: str
+    duration: int
 
-    class Config:
-        orm_mode = True
+class EventCreate(BaseModel):
+    title: str
+    description: str
+    x_coord: float
+    y_coord: float
+    time: datetime
+    end_time: datetime
+
+    @model_validator(mode="after")
+    def check_time(cls, values):
+        start, end = values.time, values.end_time
+        if end <= start:
+            raise ValueError("end_time must be after start time")
+        return values
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
