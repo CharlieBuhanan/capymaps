@@ -192,9 +192,9 @@ def delete_event(
     session.commit()
     return None
 
-# -------------------------------------
-# Cleanup Task to remove Dead Capybaras
-# -------------------------------------
+# ---------------------------------------------------------
+# Cleanup Task to remove Dead Capybaras and Finished Events
+# ---------------------------------------------------------
 
 async def cleanup_task():
     """Periodically delete expired markers every 30 minutes."""
