@@ -14,7 +14,6 @@ class CapybaraMarkerCreate(BaseModel):
     x_coord: float
     y_coord: float
     activity: ActivityEnum
-    duration: int
 
 class EventCreate(BaseModel):
     title: str

@@ -1,7 +1,7 @@
-from fastapi import FastAPI, Depends, HTTPException, Security, status
+from fastapi import Body, FastAPI, Depends, HTTPException, Security, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlmodel import Session, select
-from datetime import datetime
+from datetime import datetime, timedelta
 from contextlib import asynccontextmanager
 import asyncio
 import logging
@@ -74,6 +74,7 @@ def get_markers(session: Session = Depends(get_session)):
 @app.put("/markers/{id}")
 def update_marker(
     id: int,
+    marker_update: CapybaraMarkerCreate = Body(...),
     session: Session = Depends(get_session),
     current_user: User = Depends(get_current_user_from_token),
 ):
@@ -83,7 +84,22 @@ def update_marker(
     if capy.user_id != current_user.id:
         raise HTTPException(status_code=403, detail="Not authorized to update this capy")
     
-    
+    reset_timer = False
+
+    if (capy.x_coord != marker_update.x_coord):
+        capy.x_coord = marker_update.x_coord
+        reset_timer = True
+
+    if (capy.y_coord != marker_update.y_coord):
+        capy.y_coord = marker_update.y_coord
+        reset_timer = True
+
+    if (capy.activity != marker_update.activity):
+        capy.activity = marker_update.activity
+        reset_timer = True
+
+    if reset_timer:
+        capy.expires_at = datetime.now() + timedelta(hours=4)
         
 
 @app.delete("/markers/{id}", status_code=status.HTTP_204_NO_CONTENT)
