@@ -153,23 +153,11 @@ def update_event(
     if event.user_id != current_user.id:
         raise HTTPException(status_code=403, detail="Not authorized to update this event")
     
-    if (event.location != event_update.location):
-        event.location = event_update.location
+    update_data = event_update.model_dump(exclude_unset=True)
 
-    if (event.host != event_update.host):
-        event.host = event_update.host
-
-    if (event.description != event_update.description):
-        event.description = event_update.description
-
-    if (event.time != event_update.time):
-        event.time = event_update.time
-
-    if (event.end_time != event_update.end_time):
-        event.end_time = event_update.end_time
-
-    if (event.title != event_update.title):
-        event.title = event_update.title
+    for field, value in update_data.items():
+        if getattr(event, field) != value:
+            setattr(event, field, value)
 
     session.add(event)
     session.commit()

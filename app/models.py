@@ -1,9 +1,11 @@
-from sqlmodel import SQLModel, Field
+from sqlmodel import SQLModel, Field, UniqueConstraint
 from typing import Optional
 from datetime import datetime
 from enums import ActivityEnum
 
 class User(SQLModel, table=True):
+    __table_args__ = (UniqueConstraint("username"),)
+
     id: Optional[int] = Field(default=None, primary_key=True)
     username: str
     password: str  # hashed password

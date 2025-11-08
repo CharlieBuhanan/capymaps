@@ -1,4 +1,4 @@
-from pydantic import BaseModel, model_validator
+from pydantic import BaseModel, field_validator, model_validator
 from datetime import datetime
 from enums import ActivityEnum
 
@@ -6,6 +6,13 @@ class UserCreate(BaseModel):
     username: str
     password: str
     instagram: str | None = None
+
+    @field_validator("username")
+    @classmethod
+    def no_spaces(cls, v: str):
+        if " " in v:
+            raise ValueError("Username cannot contain spaces")
+        return v
 
 class UserLogin(BaseModel):
     username: str

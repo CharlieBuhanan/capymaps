@@ -1,3 +1,4 @@
+from fastapi import HTTPException, status
 from sqlmodel import Session, select
 from datetime import datetime, timedelta
 from models import User, CapybaraMarker, Event
@@ -9,7 +10,17 @@ from auth import hash_password, verify_password
 # ----------------------------
 
 def create_user(session: Session, user: UserCreate):
-    db_user = User(username=user.username, password=hash_password(user.password), instagram=user.instagram)
+    existing_user = session.exec(select(User).where(User.username == user.username)).first()
+    if existing_user:
+        raise HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        detail="Username already exists",
+        )
+    
+    
+    db_user = User(
+        username=user.username, password=hash_password(user.password), instagram=user.instagram
+        )
     session.add(db_user)
     session.commit()
     session.refresh(db_user)
