@@ -1,0 +1,255 @@
+import { Capy } from "../js/capy.js";
+
+const capy = new Capy()
+
+const viewport = document.getElementById('map-viewport');
+const container = document.getElementById('map-container');
+
+class InteractiveMap {
+    constructor(width, height) {
+        // Element References
+        this.viewport = viewport;
+        this.container = container;
+
+        // Map Dimensions
+        this.width = width;
+        this.height = height;
+        this.bound = (this.width + this.height) / 20; // Boundary for clamping
+
+        // State Variables (now instance properties)
+        this.scale = 1.0;
+        this.panX = 0;
+        this.panY = 0;
+        this.isDragging = false;
+        this.startX = 0;
+        this.startY = 0;
+        this.lastTouchDist = -1;
+
+        // Set initial container size
+        this.container.style.width = this.width + "px";
+        this.container.style.height = this.height + "px";
+        
+        // Add Event Listeners, binding 'this' automatically using arrow functions
+        this.viewport.addEventListener('mousedown', this.handleMouseDown);
+        window.addEventListener('mousemove', this.handleMouseMove);
+        window.addEventListener('mouseup', this.handleMouseUp);
+        this.viewport.addEventListener('wheel', this.handleWheel, { passive: false });
+        
+        this.viewport.addEventListener('touchstart', this.handleTouchStart, { passive: false });
+        this.viewport.addEventListener('touchmove', this.handleTouchMove, { passive: false });
+        window.addEventListener('touchend', this.handleTouchEnd);
+        
+        // Initial view setup
+        this.resetView();
+    }
+
+    // --- Core Map Logic Methods ---
+
+    updateTransform() {
+
+        
+        // container.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`; 
+        // Use clientWidth/Height for accurate viewport size
+
+        this.panX = Math.max(-(this.width+this.bound)*this.scale+window.innerWidth, Math.min(this.bound*this.scale, this.panX));
+        this.panY = Math.max(-(this.height+this.bound)*this.scale+window.innerHeight, Math.min(this.bound*this.scale, this.panY));
+        this.container.style.transform = `translate(${this.panX}px, ${this.panY}px) scale(${this.scale})`;
+
+        console.log(this.panX, this.panY, this.scale);
+    }
+
+    resetView = () => {
+        this.scale = 1.0;
+        // Center the map on the viewport area
+        const viewportWidth = this.viewport.clientWidth;
+        const viewportHeight = this.viewport.clientHeight;
+        
+        this.panX = -(this.width - window.innerWidth) / 2;
+        this.panY = -(this.height - window.innerHeight) / 2;
+        this.updateTransform();
+    }
+
+    // --- Mouse Event Handlers (Bound using arrow functions) ---
+
+    handleMouseDown = (e) => {
+        e.preventDefault();
+        this.isDragging = true;
+        this.viewport.style.cursor = 'grabbing';
+        this.startX = e.clientX;
+        this.startY = e.clientY;
+    }
+
+    handleMouseMove = (e) => {
+        if (!this.isDragging) return;
+        e.preventDefault();
+        
+        const dx = e.clientX - this.startX;
+        const dy = e.clientY - this.startY;
+        
+        this.panX += dx;
+        this.panY += dy;
+        
+        this.startX = e.clientX;
+        this.startY = e.clientY;
+        
+        this.updateTransform();
+    }
+
+    handleMouseUp = () => {
+        this.isDragging = false;
+        this.viewport.style.cursor = 'grab';
+    }
+
+    handleWheel = (e) => {
+        e.preventDefault();
+        
+        const zoomAmount = e.deltaY < 0 ? 1.1 : 1 / 1.1;
+        const newScale = Math.max(0.5, Math.min(3.0, this.scale * zoomAmount));
+        
+        const rect = this.viewport.getBoundingClientRect();
+        const cursorX = e.clientX - rect.left;
+        const cursorY = e.clientY - rect.top;
+        
+        const mapCursorX = (cursorX - this.panX) / this.scale;
+        const mapCursorY = (cursorY - this.panY) / this.scale;
+        
+        this.panX = cursorX - mapCursorX * newScale;
+        this.panY = cursorY - mapCursorY * newScale;
+        
+        this.scale = newScale;
+        this.updateTransform();
+    }
+
+    // --- Touch Event Handlers (Bound using arrow functions) ---
+
+    getDistance(touches) {
+        if (touches.length < 2) return -1;
+        const dx = touches[0].clientX - touches[1].clientX;
+        const dy = touches[0].clientY - touches[1].clientY;
+        return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    handleTouchStart = (e) => {
+        if (e.touches.length === 1) {
+            this.handleMouseDown({ 
+                clientX: e.touches[0].clientX, 
+                clientY: e.touches[0].clientY,
+                preventDefault: () => e.preventDefault()
+            });
+        } else if (e.touches.length === 2) {
+            this.isDragging = false;
+            this.lastTouchDist = this.getDistance(e.touches);
+        }
+    }
+
+    handleTouchMove = (e) => {
+        e.preventDefault();
+        
+        if (e.touches.length === 1 && this.isDragging) {
+            this.handleMouseMove({ 
+                clientX: e.touches[0].clientX, 
+                clientY: e.touches[0].clientY,
+                preventDefault: () => e.preventDefault()
+            });
+        } else if (e.touches.length === 2 && this.lastTouchDist !== -1) {
+            const newDist = this.getDistance(e.touches);
+            const pinchRatio = newDist / this.lastTouchDist;
+            
+            const newScale = Math.max(0.2, Math.min(5.0, this.scale * pinchRatio)); 
+
+            const rect = this.viewport.getBoundingClientRect();
+            const centerX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+            const centerY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+            
+            const cursorX = centerX - rect.left;
+            const cursorY = centerY - rect.top;
+
+            const mapCursorX = (cursorX - this.panX) / this.scale;
+            const mapCursorY = (cursorY - this.panY) / this.scale;
+
+            this.panX = cursorX - mapCursorX * newScale;
+            this.panY = cursorY - mapCursorY * newScale;
+            
+            this.scale = newScale;
+            this.lastTouchDist = newDist;
+            this.updateTransform();
+        }
+    }
+
+    handleTouchEnd = () => {
+        this.isDragging = false;
+        this.lastTouchDist = -1;
+        this.viewport.style.cursor = 'grab';
+    }
+}
+
+class MapElement {
+    constructor(map, x, y, name, child) {
+        console.log(x, y, name);
+        this.x = x;
+        this.y = y;
+        this.name = name;
+        this.div = document.createElement("div");
+        this.div.classList.add("map-element");
+        this.div.style.left = x+"px";
+        this.div.style.top = y+"px";
+        this.div.appendChild(child);
+        map.container.appendChild(this.div);
+    }
+}
+
+class MapBuilding extends MapElement {
+    constructor(map, x, y, name) {
+        const img = document.createElement("img");
+        img.src = `../assets/buildings/${name}.png`;
+        img.alt = name;
+        super(map, x, y, name, img);
+        this.div.classList.add("interactive");
+    }
+}
+
+class MapDecor extends MapElement {
+    constructor(map, x, y) {
+        const decorations = [
+            "bush1",
+            "bush2",
+            "flower1",
+            "flower2",
+            "grass1",
+            "grass2",
+            "grass3",
+            "rock1"
+        ]
+        const decoration = decorations[Math.floor(Math.random()*decorations.length)];
+
+        const img = document.createElement("img");
+        img.src = `../assets/misc/map-decoration/${decoration}.png`
+        img.alt = decoration;
+
+        super(map, x, y, decoration, img);
+    }
+}
+
+class MapCapy extends MapElement {
+    constructor(map, x, y, accessory) {
+        const capy = new Capy(accessory);
+        super(map, x, y, `${accessory}-capy`, capy.div);
+        this.div.classList.add("interactive");
+    }
+}
+
+const interactiveMap = new InteractiveMap(3000, 3000);
+
+for (let i = 0; i < interactiveMap.width; i += 100) {
+    for (let j = 0; j < interactiveMap.height; j += 100) {
+        if (Math.random() > 0.95) {
+            new MapDecor(interactiveMap, i + Math.random()*100, j + Math.random()*100);
+        }
+    }
+}
+
+new MapBuilding(interactiveMap, 1500, 1500, "dubois");
+new MapBuilding(interactiveMap, 1650, 1450, "ilc");
+
+new MapCapy(interactiveMap, 1500, 1500, "study");
+

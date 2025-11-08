@@ -1,0 +1,32 @@
+body {
+    overflow: hidden;
+}
+
+#map-viewport {
+    cursor: grab;
+    touch-action: none;
+    overflow: hidden;
+    background-color: #BAB267;
+}
+
+#map-container {
+    position: relative;
+    transform-origin: 0 0;
+    /* background-image: linear-gradient(to right, grey 1px, transparent 1px), linear-gradient(to bottom, grey 1px, transparent 1px);
+    background-size: 100px 100px; */
+}
+
+.map-element {
+    position: absolute;
+    width: 0px;
+    height: 0px;
+    transform-origin: center center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+}
+
+.map-element * {
+    scale: 0.4;
+}
