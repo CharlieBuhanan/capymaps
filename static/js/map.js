@@ -103,40 +103,40 @@ class InteractiveMap {
         document.getElementById("create-button").title = enable ? "Stop placing a capybara" : "Place a capybara!";
     }
     
-    async placeCapy(x, y) {
-        console.log("Placing capy at:", x, y);
-    try {
-        // Default activity (no UI yet)
-        const markerData = {
-            x_coord: x,
-            y_coord: y,
-            activity: "generic" // must match your ActivityEnum value (adjust if needed)
-        };
+    async placeCapy(mapX, mapY, relX, relY) {
+        console.log("Placing capy at:", mapX, mapY);
+        try {
+            // Default activity (no UI yet)
+            const markerData = {
+                x_coord: mapX,
+                y_coord: mapY,
+                activity: "generic" // must match your ActivityEnum value (adjust if needed)
+            };
 
-        const response = await fetch("http://localhost:8000/markers", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(markerData)
-        });
+            const response = await fetch("http://localhost:8000/markers", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(markerData)
+            });
 
-        if (!response.ok) {
-            throw new Error(`Backend error: ${response.status}`);
+            if (!response.ok) {
+                throw new Error(`Backend error: ${response.status}`);
+            }
+
+            const newMarker = await response.json();
+
+            // Create a visual capybara marker
+            new MapCapy(this, newMarker.x_coord, newMarker.y_coord, newMarker.activity, newMarker.id);
+            console.log("Capybara placed successfully!");
+
+        } catch (err) {
+            console.error("Failed to place capybara:", err);
+            alert("Could not place capybara. Check console for details.");
+        } finally {
+            this.togglePlacingCapy(false);
         }
-
-        const newMarker = await response.json();
-
-        // Create a visual capybara marker
-        new MapCapy(this, newMarker.x_coord, newMarker.y_coord, newMarker.activity, newMarker.id);
-        console.log("Capybara placed successfully!");
-
-    } catch (err) {
-        console.error("Failed to place capybara:", err);
-        alert("Could not place capybara. Check console for details.");
-    } finally {
-        this.togglePlacingCapy(false);
-    }
     }
 
     // --- Mouse Event Handlers (Bound using arrow functions) ---
