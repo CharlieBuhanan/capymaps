@@ -1,5 +1,6 @@
 import { Capy } from "../js/capy.js";
 import { buildingData } from "../js/building.js";
+import { InspectMenu } from "./inspect.js";
 
 const viewport = document.getElementById('map-viewport');
 const container = document.getElementById('map-container');
@@ -58,6 +59,7 @@ class InteractiveMap {
         this.panY = Math.max(-(this.height+this.bound)*this.scale+window.innerHeight, Math.min(this.bound*this.scale, this.panY));
         this.scale = Math.max(0.5, Math.min(3.0, this.scale));
         this.container.style.transform = `translate(${this.panX}px, ${this.panY}px) scale(${this.scale})`;
+        InspectMenu.removeAll();
     }
 
     resetView = () => {
@@ -101,8 +103,9 @@ class InteractiveMap {
         document.getElementById("create-button").title = enable ? "Stop placing a capybara" : "Place a capybara!";
     }
     
-    placeCapy(x, y) {
-        console.log(x, y)
+    placeCapy(mapX, mapY, relX, relY) {
+        const accessoriesDiv = document.createElement("div");
+        new InspectMenu(relX, relY, "New capybara!", "What is your capybara doing right now?");
         this.togglePlacingCapy(false);
     }
 
@@ -113,7 +116,7 @@ class InteractiveMap {
         if (this.placingCapy) {
             const x = -((this.panX-e.clientX)/this.scale);
             const y = -((this.panY-e.clientY)/this.scale);
-            this.placeCapy(x, y);
+            this.placeCapy(x, y, e.clientX, e.clientY);
         } else {
             this.isDragging = true;
             this.viewport.style.cursor = 'grabbing';
