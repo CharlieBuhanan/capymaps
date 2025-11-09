@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Capymaps Sign Up</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/login.css">
+    <link rel="icon" href="../assets/capys/map.png" type="image/x-icon">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Momo+Trust+Sans:wght@200..800&display=swap" rel="stylesheet">
+
+    <script src="../js/signup.js" type="module" defer></script>
+</head>
+<body>
+    <div id="signup-container" class="glass">
+        <div id="signup-logo">
+            <img src="../assets/capys/map.png" alt="Capymaps logo">
+            <h1>Join Capymaps</h1>
+        </div>
+
+        <form id="signup-form">
+            <input type="text" id="username" name="username" placeholder="Username" required>
+            <input type="password" id="password" name="password" placeholder="Password" required>
+            <input type="text" id="instagram" name="instagram" placeholder="Instagram (optional)">
+            <button type="submit" class="interactive">Sign Up</button>
+        </form>
+
+        <p id="signup-message"></p>
+
+        <div id="signup-footer">
+            <p>Already have an account? <a href="./login.html">Log in</a></p>
+        </div>
+    </div>
+</body>
+</html>
