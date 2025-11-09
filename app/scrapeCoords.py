@@ -66,8 +66,8 @@ def normalizeCoords(location): # turns lat, long arrays into capy coords, 3000x3
         return None
     lat = round(coords[0],11)
     long = round(coords[1],11)
-    y = 3000-((lat-42.3742) * 10**5)
-    x = 3000-((-(long+72.52024) * 10**5)*1.9)
+    y = 3000-(((lat-42.376) * 10**5)*1.3) 
+    x = -((((long+72.51) * 10**5))*1.6)-1300
     return [round(x), round(y)]
 
 months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
@@ -202,7 +202,10 @@ drawn = [
 "ILC",
 "Honors College",
 "Manning", #includes both computer science laboratories
-"Football Stadium"#McGuirk Alumni Stadium
+"Football Stadium",#McGuirk Alumni Stadium
+"Old Chapel",
+"OHill",
+"Northeast"
 ]
 
 if __name__ == "__main__":
