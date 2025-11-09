@@ -30,3 +30,44 @@ body {
 .map-element * {
     scale: 0.4;
 }
+
+#footer {
+    width: 100%;
+    position: fixed;
+    z-index: 1000;
+    bottom: 0;
+    padding-bottom: 8px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#footer * {
+    border-radius: 100px;
+}
+
+#footer-left {
+    padding-left: 8px;
+}
+
+#footer-right {
+    padding-right: 8px;
+}
+
+#create-button {
+    background-color: transparent;
+    display: flex;
+    margin: 0;
+    padding: 0;
+}
+
+#create-button * {
+    height: 72px;
+    width: auto;
+}
+
+#create-button:hover svg path {
+    opacity: 0.5;
+    transition: fill 0.1s linear !important; 
+}
