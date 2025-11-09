@@ -176,7 +176,7 @@ button[title]:hover::after {
     flex-direction: column;
     left: 50%;
     top: 50%;
-    padding: 8px;
+    padding: 4px;
     border-radius: 4px;
     gap: 4px;
     width: auto;
@@ -185,4 +185,17 @@ button[title]:hover::after {
     opacity: 0; 
     visibility: hidden; 
     transition: opacity 0.1s linear, visibility 0.1s linear;
+}
+
+.inspect * > button {
+    padding: 5px 10px;
+    background-color: rgb(74, 46, 33); 
+    color: rgb(243, 215, 201); 
+    border-radius: 2px;
+    font-size: medium;
+    font-weight: 400; 
+}
+
+.inspect * > button:hover {
+    background-color: rgba(74, 46, 33, 0.5); 
 }

@@ -26,6 +26,8 @@ class InteractiveMap {
         this.startY = 0;
         this.lastTouchDist = -1;
         this.placingCapy = false;
+        this.ghostMapCapy = undefined;
+        this.capyInspect = undefined;
 
         // Set initial container size
         this.container.style.width = this.width + "px";
@@ -60,6 +62,7 @@ class InteractiveMap {
         this.scale = Math.max(0.5, Math.min(3.0, this.scale));
         this.container.style.transform = `translate(${this.panX}px, ${this.panY}px) scale(${this.scale})`;
         InspectMenu.removeAll();
+        this.clearGhostMapCapy();
     }
 
     resetView = () => {
@@ -101,16 +104,106 @@ class InteractiveMap {
         document.getElementById("create-plus-icon").style.visibility = enable ? "hidden" : "visible";
         document.getElementById("create-exit-icon").style.visibility = enable ? "visible" : "hidden";
         document.getElementById("create-button").title = enable ? "Stop placing a capybara" : "Place a capybara!";
+        this.clearCapyInspect();
+        this.clearGhostMapCapy();
     }
-    
-    async placeCapy(mapX, mapY, relX, relY) {
+
+    clearCapyInspect() {
+        if (this.capyInspect !== undefined) {
+            this.capyInspect.remove();
+            this.capyInspect = undefined;
+        }
+    }
+
+    clearGhostMapCapy() {
+        if (this.ghostCapy !== undefined) {
+            this.ghostCapy.div.remove();
+            this.ghostCapy = undefined;
+        }
+    }
+
+    placeCapy(mapX, mapY, relX, relY) {
+        const content = document.createElement("div");
+
+        const scrollBox = document.createElement("div");
+        scrollBox.style.width = "100%";
+        scrollBox.style.maxHeight = "350px";
+        scrollBox.style.overflowX = "hidden";
+        scrollBox.style.overflowY = "auto";
+
+        const flexGrid = document.createElement("div");
+        flexGrid.style.display = "flex"
+        flexGrid.style.flexDirection = "row";
+        flexGrid.style.flexWrap = "wrap";
+
+        const submit = document.createElement("button");
+        submit.textContent = "Submit";
+        submit.style.marginTop = "4px";
+        submit.style.width = "100%";
+
+        scrollBox.appendChild(flexGrid);
+        content.appendChild(scrollBox);
+        content.appendChild(submit);
+
+        let selectedCapy = undefined;
+        const select = (capy) => {
+            if (selectedCapy !== undefined) {
+                selectedCapy.div.style.opacity = 1;
+            }
+            capy.div.style.opacity = 0.5;
+            selectedCapy = capy
+        };
+        
+        for (const accessory of ["generic", "art", "exercise", "sports", "study"]) {
+            const button = document.createElement("button");
+            button.style.width = "100px";
+            button.style.height = "100px";
+            button.style.flex = "0 0 100px";
+            button.style.backgroundColor = "transparent";
+            button.classList.add("interactive");
+            
+            const capy = new Capy(accessory);
+            capy.div.style.transition = "opacity 0.1s linear, visibility 0.1s linear";
+            for (const child of capy.div.children) {
+                child.style = "width:100%; height:100%; position:absolute; left:0%; top:0%";
+            }
+
+            button.addEventListener("click", () => select(capy));
+            if (selectedCapy === undefined) {
+                select(capy)
+            }
+
+            button.appendChild(capy.div);
+            flexGrid.appendChild(button);
+        }
+        
+        const inspectMenu = new InspectMenu(relX, relY, "Placing capybara", "What is your capybara doing right now?", content);
+
+        submit.addEventListener("click", () => {
+            this.clearGhostMapCapy();
+            this.postCapy(mapX, mapY, selectedCapy.accessory);
+            inspectMenu.remove();
+            
+        }, { once: true });
+        this.togglePlacingCapy(false);
+
+        this.clearCapyInspect();
+
+        this.capyInspect = inspectMenu;
+
+        const ghostCapy = new MapCapy(this, mapX, mapY, "generic", -2);
+        ghostCapy.div.style.opacity = 0.3;
+        ghostCapy.div.classList.remove("interactive");
+        this.ghostCapy = ghostCapy;
+    }
+
+    async postCapy(mapX, mapY, activity) {
         console.log("Placing capy at:", mapX, mapY);
         try {
-            // Default activity (no UI yet)
             const markerData = {
                 x_coord: mapX,
                 y_coord: mapY,
-                activity: "generic" // must match your ActivityEnum value (adjust if needed)
+                activity: activity!==undefined ? activity : "generic"
             };
 
             const response = await fetch("http://localhost:8000/markers", {
