@@ -10,36 +10,6 @@ from scrapeCoords import EventPrototype, normalizeCoords, scanCapyEvents
 # - normalizeCoords()
 # - scanCapyEvents(n)
 
-# --- SQLModel ORM definitions ---
-
-class Location(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
-    name: str = Field(unique=True)
-    x_coord: float
-    y_coord: float
-
-    events: List["Event"] = Relationship(back_populates="location")
-
-
-class Host(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
-    name: str = Field(unique=True)
-
-    events: List["Event"] = Relationship(back_populates="host")
-
-
-class Event(SQLModel, table=True):
-    id: int = Field(primary_key=True)
-    title: str
-    description: str
-    time: datetime
-    end_time: datetime
-
-    location_id: Optional[int] = Field(default=None, foreign_key="location.id")
-    host_id: Optional[int] = Field(default=None, foreign_key="host.id")
-
-    location: Optional[Location] = Relationship(back_populates="events")
-    host: Optional[Host] = Relationship(back_populates="events")
 
 
 # --- Insert logic using the ORM ---
