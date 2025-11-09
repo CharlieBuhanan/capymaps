@@ -14,7 +14,7 @@ class InteractiveMap {
         // Map Dimensions
         this.width = width;
         this.height = height;
-        this.bound = (this.width + this.height) / 20; // Boundary for clamping
+        this.bound = 0; // Boundary for clamping
 
         // State Variables (now instance properties)
         this.scale = 1.0;
