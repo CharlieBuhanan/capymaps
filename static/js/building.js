@@ -1,3 +1,5 @@
+// listen man im sorry i did it manually
+
 export const buildingData = [
     {
         name: "berk",
@@ -74,12 +76,12 @@ export const buildingData = [
     },
     {
         name: "northeast",
-        lat: 2116,
+        lat: 2200,
         long: 939,
     },
     {
         name: "ohill",
-        lat: 1686,
+        lat: 2550,
         long: 1232,
     },
     {
