@@ -31,19 +31,39 @@ body {
     scale: 0.4;
 }
 
+#placing-capy {
+    top: 20%;
+    left: 50%;
+    transform: translate(-50%, -20%);
+    position: absolute;
+    white-space: nowrap; 
+    padding: 5px 10px;
+    background-color: rgb(74, 46, 33); 
+    color: rgb(243, 215, 201); 
+    border-radius: 4px;
+    font-size: medium;
+    font-weight: 400; 
+    z-index: 1001;
+
+    opacity: 0; 
+    visibility: hidden; 
+    transition: opacity 0.2s linear, visibility 0.2s linear;
+}
+
 #footer {
     width: 100%;
     position: fixed;
     z-index: 1000;
     bottom: 0;
     padding-bottom: 8px;
-
     display: flex;
     justify-content: space-between;
     align-items: end;
+    pointer-events: none;
 }
 
 #footer * > div {
+    pointer-events: all;
     border-radius: 100px;
 }
 
@@ -77,7 +97,7 @@ body {
 }
 
 #create-button * {
-    height: 72px;
+    height: 64px;
     width: auto;
 }
 

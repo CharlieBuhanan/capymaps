@@ -2,6 +2,7 @@ import { Capy } from "../js/capy.js";
 
 const viewport = document.getElementById('map-viewport');
 const container = document.getElementById('map-container');
+const placingCapyPopup = document.getElementById("placing-capy");
 
 class InteractiveMap {
     constructor(width, height) {
@@ -22,6 +23,7 @@ class InteractiveMap {
         this.startX = 0;
         this.startY = 0;
         this.lastTouchDist = -1;
+        this.placingCapy = false;
 
         // Set initial container size
         this.container.style.width = this.width + "px";
@@ -38,18 +40,32 @@ class InteractiveMap {
         window.addEventListener('touchend', this.handleTouchEnd);
 
         document.getElementById("recenter-button").addEventListener("click", this.resetView);
-        document.getElementById("zoomin-button").addEventListener("click", () => {
-            this.zoomCenter(1.1);
-        });
-        document.getElementById("zoomout-button").addEventListener("click", () => {
-            this.zoomCenter(0.9);
-        });
+        document.getElementById("zoomin-button").addEventListener("click", () => this.zoomCenter(1.1));
+        document.getElementById("zoomout-button").addEventListener("click", () => this.zoomCenter(0.9));
+        document.getElementById("create-button").addEventListener("click", () => this.togglePlacingCapy(!this.placingCapy));
 
         // Initial view setup
         this.resetView();
     }
 
     // --- Core Map Logic Methods ---
+
+    updateTransform() {
+        // container.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`; 
+        // Use clientWidth/Height for accurate viewport size
+        this.panX = Math.max(-(this.width+this.bound)*this.scale+window.innerWidth, Math.min(this.bound*this.scale, this.panX));
+        this.panY = Math.max(-(this.height+this.bound)*this.scale+window.innerHeight, Math.min(this.bound*this.scale, this.panY));
+        this.scale = Math.max(0.5, Math.min(3.0, this.scale));
+        this.container.style.transform = `translate(${this.panX}px, ${this.panY}px) scale(${this.scale})`;
+    }
+
+    resetView = () => {
+        this.scale = 1.0;
+        // Center the map on the viewport area
+        this.panX = -(this.width - window.innerWidth) / 2;
+        this.panY = -(this.height - window.innerHeight) / 2;
+        this.updateTransform();
+    }
 
     zoomCenter(zoom) {
         const newScale = this.scale*zoom;
@@ -74,34 +90,32 @@ class InteractiveMap {
         this.updateTransform();
     }
 
-    updateTransform() {
-        // container.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`; 
-        // Use clientWidth/Height for accurate viewport size
-        this.panX = Math.max(-(this.width+this.bound)*this.scale+window.innerWidth, Math.min(this.bound*this.scale, this.panX));
-        this.panY = Math.max(-(this.height+this.bound)*this.scale+window.innerHeight, Math.min(this.bound*this.scale, this.panY));
-        this.scale = Math.max(0.5, Math.min(3.0, this.scale));
-        this.container.style.transform = `translate(${this.panX}px, ${this.panY}px) scale(${this.scale})`;
+    togglePlacingCapy(enable) {
+        this.viewport.style.cursor = enable ? "pointer" : "";
+        placingCapyPopup.style.opacity = enable ? 1 : 0;
+        placingCapyPopup.style.visibility = enable ? "visible" : "hidden";
+        this.placingCapy = enable
     }
-
-    resetView = () => {
-        this.scale = 1.0;
-        // Center the map on the viewport area
-        const viewportWidth = this.viewport.clientWidth;
-        const viewportHeight = this.viewport.clientHeight;
-        
-        this.panX = -(this.width - window.innerWidth) / 2;
-        this.panY = -(this.height - window.innerHeight) / 2;
-        this.updateTransform();
+    
+    placeCapy(x, y) {
+        console.log(x, y)
+        this.togglePlacingCapy(false);
     }
 
     // --- Mouse Event Handlers (Bound using arrow functions) ---
 
     handleMouseDown = (e) => {
         e.preventDefault();
-        this.isDragging = true;
-        this.viewport.style.cursor = 'grabbing';
-        this.startX = e.clientX;
-        this.startY = e.clientY;
+        if (this.placingCapy) {
+            const x = -((this.panX-e.clientX)/this.scale);
+            const y = -((this.panY-e.clientY)/this.scale);
+            this.placeCapy(x, y);
+        } else {
+            this.isDragging = true;
+            this.viewport.style.cursor = 'grabbing';
+            this.startX = e.clientX;
+            this.startY = e.clientY;
+        }
     }
 
     handleMouseMove = (e) => {
@@ -243,7 +257,8 @@ class MapDecor extends MapElement {
             "grass1",
             "grass2",
             "grass3",
-            "rock1"
+            "rock1",
+            "squirrel"
         ]
         const decoration = decorations[Math.floor(Math.random()*decorations.length)];
 
