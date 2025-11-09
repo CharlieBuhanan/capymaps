@@ -1,5 +1,6 @@
 import { Capy } from "../js/capy.js";
 import { buildingData } from "../js/building.js";
+import { InspectMenu } from "./inspect.js";
 
 const viewport = document.getElementById('map-viewport');
 const container = document.getElementById('map-container');
@@ -58,6 +59,7 @@ class InteractiveMap {
         this.panY = Math.max(-(this.height+this.bound)*this.scale+window.innerHeight, Math.min(this.bound*this.scale, this.panY));
         this.scale = Math.max(0.5, Math.min(3.0, this.scale));
         this.container.style.transform = `translate(${this.panX}px, ${this.panY}px) scale(${this.scale})`;
+        InspectMenu.removeAll();
     }
 
     resetView = () => {
@@ -101,40 +103,40 @@ class InteractiveMap {
         document.getElementById("create-button").title = enable ? "Stop placing a capybara" : "Place a capybara!";
     }
     
-    async placeCapy(x, y) {
-        console.log("Placing capy at:", x, y);
-    try {
-        // Default activity (no UI yet)
-        const markerData = {
-            x_coord: x,
-            y_coord: y,
-            activity: "generic" // must match your ActivityEnum value (adjust if needed)
-        };
+    async placeCapy(mapX, mapY, relX, relY) {
+        console.log("Placing capy at:", mapX, mapY);
+        try {
+            // Default activity (no UI yet)
+            const markerData = {
+                x_coord: mapX,
+                y_coord: mapY,
+                activity: "generic" // must match your ActivityEnum value (adjust if needed)
+            };
 
-        const response = await fetch("http://localhost:8000/markers", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(markerData)
-        });
+            const response = await fetch("http://localhost:8000/markers", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(markerData)
+            });
 
-        if (!response.ok) {
-            throw new Error(`Backend error: ${response.status}`);
+            if (!response.ok) {
+                throw new Error(`Backend error: ${response.status}`);
+            }
+
+            const newMarker = await response.json();
+
+            // Create a visual capybara marker
+            new MapCapy(this, newMarker.x_coord, newMarker.y_coord, newMarker.activity, newMarker.id);
+            console.log("Capybara placed successfully!");
+
+        } catch (err) {
+            console.error("Failed to place capybara:", err);
+            alert("Could not place capybara. Check console for details.");
+        } finally {
+            this.togglePlacingCapy(false);
         }
-
-        const newMarker = await response.json();
-
-        // Create a visual capybara marker
-        new MapCapy(this, newMarker.x_coord, newMarker.y_coord, newMarker.activity, newMarker.id);
-        console.log("Capybara placed successfully!");
-
-    } catch (err) {
-        console.error("Failed to place capybara:", err);
-        alert("Could not place capybara. Check console for details.");
-    } finally {
-        this.togglePlacingCapy(false);
-    }
     }
 
     // --- Mouse Event Handlers (Bound using arrow functions) ---
@@ -144,7 +146,7 @@ class InteractiveMap {
         if (this.placingCapy) {
             const x = -((this.panX-e.clientX)/this.scale);
             const y = -((this.panY-e.clientY)/this.scale);
-            this.placeCapy(x, y);
+            this.placeCapy(x, y, e.clientX, e.clientY);
         } else {
             this.isDragging = true;
             this.viewport.style.cursor = 'grabbing';
@@ -336,6 +338,7 @@ class MapCapy extends MapElement {
     constructor(map, x, y, accessory, id) {
         const capy = new Capy(accessory);
         super(map, x, y, `${accessory}-capy`, capy.div);
+        this.div.style.zIndex = 10001;
         this.div.classList.add("interactive");
         MapCapy.ids.set(id, this);
     }
