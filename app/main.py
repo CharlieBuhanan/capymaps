@@ -32,6 +32,8 @@ APP_DIR = Path(__file__).resolve().parent
 BASE_DIR = APP_DIR.parent 
 STATIC_DIR = BASE_DIR / "static"
 MAP_HTML_PATH = STATIC_DIR / "html" / "map.html"
+LOGIN_HTML_PATH = STATIC_DIR / "html" / "login.html"
+SIGNUP_HTML_PATH = STATIC_DIR / "html" / "signup.html"
 
 app = FastAPI(title="Mapybara")
 
@@ -39,17 +41,24 @@ app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 @app.get("/", summary="Serves the main map.html file")
 async def serve_map_html():
-    """
-    Returns the map.html file as the main page.
-    It uses FileResponse for efficient file serving.
-    """
     if not MAP_HTML_PATH.exists():
-        # Basic check to ensure the file exists before trying to serve it
         print(f"Error: Map HTML file not found at {MAP_HTML_PATH}", file=sys.stderr)
         return {"error": "Internal Server Error - Map file not found"}, 500
-
-    # The media_type is set to text/html so the browser renders it correctly
     return FileResponse(MAP_HTML_PATH, media_type="text/html")
+
+@app.get("/login")
+async def serve_login():
+    if not LOGIN_HTML_PATH.exists():
+        print(f"Error: HTML file not found at {LOGIN_HTML_PATH}", file=sys.stderr)
+        return {"error": "Internal Server Error - file not found"}, 500
+    return FileResponse(LOGIN_HTML_PATH, media_type="text/html")
+
+@app.get("/sign-up")
+async def serve_login():
+    if not SIGNUP_HTML_PATH.exists():
+        print(f"Error: HTML file not found at {SIGNUP_HTML_PATH}", file=sys.stderr)
+        return {"error": "Internal Server Error - file not found"}, 500
+    return FileResponse(SIGNUP_HTML_PATH, media_type="text/html")
 
 
 app.add_middleware(

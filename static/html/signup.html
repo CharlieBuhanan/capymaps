@@ -4,20 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Capymaps Sign Up</title>
-    <link rel="stylesheet" href="../css/style.css">
-    <link rel="stylesheet" href="../css/login.css">
-    <link rel="icon" href="../assets/capys/map.png" type="image/x-icon">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/login.css">
+    <link rel="icon" href="/static/" type="image/x-icon">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Momo+Trust+Sans:wght@200..800&display=swap" rel="stylesheet">
 
-    <script src="../js/signup.js" type="module" defer></script>
+    <script src="/static/js/signup.js" type="module" defer></script>
 </head>
 <body>
+    <div id="header" class="glass">
+        <div id="logo">
+            <div><img src="/static/assets/capys/map.png" alt="Logo" class="interactive"></div>
+            <button id="logo-text">Capymaps</button>
+        </div>
+
+        <div id="header-buttons">
+            <button>Map</button>
+            <button>Account</button>
+        </div>
+    </div>
     <div id="signup-container" class="glass">
         <div id="signup-logo">
-            <img src="../assets/capys/map.png" alt="Capymaps logo">
+            <img src="/static/assets/capys/map.png" alt="Capymaps logo">
             <h1>Join Capymaps</h1>
         </div>
 
@@ -31,7 +42,7 @@
         <p id="signup-message"></p>
 
         <div id="signup-footer">
-            <p>Already have an account? <a href="./login.html">Log in</a></p>
+            <p>Already have an account? <a href="/static/html/login.html">Log in</a></p>
         </div>
     </div>
 </body>
