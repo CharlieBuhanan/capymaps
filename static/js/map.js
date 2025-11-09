@@ -335,27 +335,134 @@ class MapDecor extends MapElement {
 
 class MapCapy extends MapElement {
     static ids = new Map();
+    static globalClickHandler = null; // shared handler function
+
     constructor(map, x, y, accessory, id) {
         const capy = new Capy(accessory);
         super(map, x, y, `${accessory}-capy`, capy.div);
+        this.id = id;
         this.div.style.zIndex = 10001;
         this.div.classList.add("interactive");
         MapCapy.ids.set(id, this);
+
+        // Attach the shared handler if it exists
+        this.div.addEventListener("click", (event) => {
+            event.stopPropagation();
+            if (MapCapy.globalClickHandler) {
+                MapCapy.globalClickHandler(this, event);
+            }
+        });
+    }
+    static setGlobalClickHandler(handler) {
+        MapCapy.globalClickHandler = handler;
     }
 }
+MapCapy.setGlobalClickHandler(async (capy, event) => {
+    console.log("Capy clicked: {capy.id}");
+    InspectMenu.removeAll();
+    const randomNumber = Math.floor(Math.random() * 10);
+    const capyQuotes = [
+        "Capy diem. Seize the lettuce!",
+        "Keep calm and capy on.",
+        "Don't worry, be capy.",
+        "This capy is locked in a staring contest with you.",
+        "Why did the capybara cross the road? To prove it wasn't chicken!",
+        "Feeling a bit capy-tivated by you.",
+        "This capybara is asleep. Zzz...",
+        "Yo.",
+        "This capybara is to shy to talk.",
+        "Just a capybara living its best life."
+    ];
+    let id = "";
+    if (capy.id===undefined) {
+        id = "Random Capybara";
+    } else {
+        id = "Capybara Number " + (capy.id).toString();
+    }
+    const accessory = capy.accessory===undefined? "Nothing":capy.accessory;
+    const quote = capyQuotes[randomNumber];
+
+    InspectMenu.removeAll();
+    new InspectMenu(
+        event.clientX,
+        event.clientY,
+        `${id}`,
+        `This Capybara is busy with: ${accessory}. \n\n ${quote}`,
+        undefined
+    );
+});
+
 
 class MapAlert extends MapElement {
     static ids = new Map();
+    static globalClickHandler = null;
+
     constructor(map, x, y, name, id) {
         const img = document.createElement("img");
         img.src = `../assets/misc/alert.png`;
         img.alt = name;
+
         super(map, x, y, `${name}-alert`, img);
+        this.id = id;
+        this.name = name;
+        this.type = "alert";
+
         this.div.classList.add("interactive");
         MapAlert.ids.set(id, this);
-        console.log(MapAlert.ids);
+        const self = this;
+        this.div.addEventListener("click", (event) => {
+            event.stopPropagation();
+            if (MapAlert.globalClickHandler) {
+                MapAlert.globalClickHandler(self, event);
+            }
+        });
+    }
+
+    static setGlobalClickHandler(handler) {
+        MapAlert.globalClickHandler = handler;
     }
 }
+MapAlert.setGlobalClickHandler(async (alert, event) => {
+    console.log(`Clicked alert #${alert.id} (${alert.name})`);
+    console.log("Loading events from backend...");
+    let dbEvent = null;
+    try {
+        const response = await fetch("http://localhost:8000/events", {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+        if (!response.ok) {
+            throw new Error(`Backend error: ${response.status}`);
+        }
+        const events = await response.json();
+        console.log(`Fetched ${events.length} events from backend.`);
+        // Loop through and place each event marker on the map
+        dbEvent = events.find(ev => ev.id === alert.id);
+        if (!dbEvent) {
+            throw new Error(`Event with ID ${alert.id} not found.`);
+        }
+    } catch (err) {
+        console.error("Failed to load events:", err);
+        alert("Could not load events. Check console for details.");
+    }
+    const content = document.createElement("div");
+    const jsDate = new Date(dbEvent.time);
+    content.innerHTML = `
+        <p><strong>Host:</strong> ${dbEvent.host}</p>
+        <p><strong>Time:</strong> (${jsDate.toLocaleString()})</p>
+    `;
+    // USE THIS
+    InspectMenu.removeAll();
+    new InspectMenu(
+        event.clientX,
+        event.clientY,
+        dbEvent.title,
+        dbEvent.description,
+        content
+    );
+});
 
 async function loadCapybaras(map) {
     try {
@@ -390,7 +497,6 @@ for (let i = 0; i < interactiveMap.width; i += 100) {
 buildingData.forEach(building => {
     new MapBuilding(interactiveMap, building.lat, building.long, building.name);
 });
-
 
 async function loadEvents(n) {
     console.log("Loading events from backend...");
