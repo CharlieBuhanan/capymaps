@@ -1,5 +1,3 @@
-from sqlmodel import SQLModel, Field, Relationship, create_engine, Session, select
-from typing import Optional, List
 from datetime import datetime
 from scrapeCoords import EventPrototype, normalizeCoords, scanCapyEvents
 
