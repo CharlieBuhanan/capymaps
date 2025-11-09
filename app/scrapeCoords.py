@@ -48,7 +48,7 @@ longlat = {
     "Honors College": [42.38819221356291, -72.53051117860147],
     "Manning": [42.395246017909464, -72.53080788616757], #includes both computer science laboratories
     "Football Stadium": [42.377252931569565, -72.53600655080845], #McGuirk Alumni Stadium
-    "OHill": [42.39188112425516, -72.51923077218746],
+    #"OHill": [42.39188112425516, -72.51923077218746],
     "Old Chapel": [42.3889931002094, -72.52798157448849],
     "Northeast": [42.394813141060865, -72.52489040461563]
 }
@@ -202,7 +202,10 @@ drawn = [
 "ILC",
 "Honors College",
 "Manning", #includes both computer science laboratories
-"Football Stadium"#McGuirk Alumni Stadium
+"Football Stadium",#McGuirk Alumni Stadium
+"Old Chapel",
+"OHill",
+"Northeast"
 ]
 
 if __name__ == "__main__":
