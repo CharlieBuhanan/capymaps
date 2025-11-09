@@ -10,7 +10,7 @@ export class Capy {
         capyImg.style.transform = "translate(-100%, -100%)";
         this.div.appendChild(capyImg);
 
-        if (accessory !== undefined) {
+        if (accessory !== "generic") {
             const accessoryImg = document.createElement("img");
             accessoryImg.src = `../assets/accessories/${accessory}.png`;
             accessoryImg.style.position = "absolute";

@@ -1,6 +1,7 @@
 from enum import Enum
 
 class ActivityEnum(str, Enum):
+    generic = "generic"
     studying = "studying"
     eating = "eating"
     onMyPuter = "computer"

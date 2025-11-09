@@ -1,10 +1,10 @@
 from datetime import datetime
 from sqlmodel import Session, select
-from scrapeCoords import EventPrototype, normalizeCoords, scanCapyEvents
+from scrapeCoords import EventPrototype
 from db import get_session, engine
 from models import Event  # your existing SQLModel table class
 
-
+#THESE DO NOT WORK IF @contextmanager IS NOT USED IN db.py FOR get_session(). REVERT WHEN NOT IN USE.
 def insert_events_to_existing_db(events: list[EventPrototype]):
     """Insert parsed EventPrototype objects into existing SQLModel table 'event'."""
     with get_session() as session:
@@ -42,15 +42,25 @@ def deleteEvent(event_id: int):
         else:
             print(f"No event found with ID {event_id}.")
 
-def select():
-    #TODO implement select
-    pass
+def select(event_id: int):
+    with get_session() as session:
+        event = session.get(Event, event_id)
+        if event:
+            #print(f"Event ID: {event.id}, Title: {event.title}, Time: {event.time}")
+            eventList = [event.id, event.title, event.host, event.description, event.x_coord, event.y_coord, event.location, event.time, event.end_time]
+            return eventList
+        else:
+            print(f"No event found with ID {event_id}.")
 
 def main():
-    for i in range(3, 204):
+    for i in range(3, 4):
+        print(select(i))
+
+    
+    """for i in range(3, 204):
         deleteEvent(i)
     events = scanCapyEvents(100000)
-    insert_events_to_existing_db(events)
+    insert_events_to_existing_db(events)"""
 
 if __name__ == "__main__":
     main()
