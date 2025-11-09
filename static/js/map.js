@@ -101,9 +101,40 @@ class InteractiveMap {
         document.getElementById("create-button").title = enable ? "Stop placing a capybara" : "Place a capybara!";
     }
     
-    placeCapy(x, y) {
-        console.log(x, y)
+    async placeCapy(x, y) {
+        console.log("Placing capy at:", x, y);
+    try {
+        // Default activity (no UI yet)
+        const markerData = {
+            x_coord: x,
+            y_coord: y,
+            activity: "generic" // must match your ActivityEnum value (adjust if needed)
+        };
+
+        const response = await fetch("http://localhost:8000/markers", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(markerData)
+        });
+
+        if (!response.ok) {
+            throw new Error(`Backend error: ${response.status}`);
+        }
+
+        const newMarker = await response.json();
+
+        // Create a visual capybara marker
+        new MapCapy(this, newMarker.x_coord, newMarker.y_coord, newMarker.activity, newMarker.id);
+        console.log("Capybara placed successfully!");
+
+    } catch (err) {
+        console.error("Failed to place capybara:", err);
+        alert("Could not place capybara. Check console for details.");
+    } finally {
         this.togglePlacingCapy(false);
+    }
     }
 
     // --- Mouse Event Handlers (Bound using arrow functions) ---
@@ -323,7 +354,27 @@ class MapAlert extends MapElement {
     }
 }
 
+async function loadCapybaras(map) {
+    try {
+        const response = await fetch("http://localhost:8000/markers");
+        if (!response.ok) {
+            throw new Error(`Failed to fetch markers: ${response.status}`);
+        }
+
+        const markers = await response.json();
+
+        markers.forEach(m => {
+            new MapCapy(map, m.x_coord, m.y_coord, m.activity, m.id);
+        });
+
+        console.log(`Loaded ${markers.length} capybaras from backend.`);
+    } catch (err) {
+        console.error("Error loading capybaras:", err);
+    }
+}
+
 const interactiveMap = new InteractiveMap(3000, 3000);
+await loadCapybaras(interactiveMap);
 
 for (let i = 0; i < interactiveMap.width; i += 100) {
     for (let j = 0; j < interactiveMap.height; j += 100) {
