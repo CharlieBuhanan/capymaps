@@ -1,116 +1,118 @@
+// listen man im sorry i did it manually
+
 export const buildingData = [
     {
         name: "berk",
-        lat: 772,
-        long: 1859,
+        lat: 1141,
+        long: 2228,
         
     },
     {
         name: "bromery",
-        lat: 1335,
-        long: 1122,
+        lat: 1878,
+        long: 1665,
         
     },
     {
         name: "campuscenter",
-        lat: 1753,
-        long: 1277,
+        lat: 1723,
+        long: 1247,
         
     },
     {
         name: "chc",
-        lat: 1399,
-        long: 1952,
+        lat: 1048,
+        long: 1601,
     
     },
     {
         name: "dubois",
-        lat: 1566,
-        long: 1532,
+        lat: 1468,
+        long: 1434,
     
     },
     {
         name: "frank",
-        lat: 1505,
-        long: 437,
+        lat: 2563,
+        long: 1495,
     
     },
     {
         name: "goodell",
-        lat: 1458,
-        long: 1700,
+        lat: 1300,
+        long: 1542,
     
     },
     {
         name: "hamp",
-        lat: 964,
-        long: 1951,
+        lat: 1049,
+        long: 2036,
     
     },
     {
         name: "ilc",
-        lat: 1674,
-        long: 1032,
+        lat: 1968,
+        long: 1326,
     },
     {
         name: "isenberg",
-        lat: 1314,
-        long: 872,
+        lat: 2128,
+        long: 1686,
     },
     {
         name: "lgrc",
-        lat: 1972,
-        long: 1417,
+        lat: 1583,
+        long: 1028,
     },
     {
         name: "manning",
-        lat: 2105,
-        long: 2008,
+        lat: 992,
+        long: 895,
     },
     {
         name: "morrill",
-        lat: 1674,
-        long: 722,
+        lat: 2278,
+        long: 1326,
     },
     {
         name: "northeast",
-        lat: 1314,
-        long: 872,
+        lat: 2200,
+        long: 939,
     },
     {
         name: "ohill",
-        lat: 1314,
-        long: 872,
+        lat: 2550,
+        long: 1232,
     },
     {
         name: "oldchapel",
-        lat: 1314,
-        long: 872,
+        lat: 1529,
+        long: 1521,
     },
     {
         name: "pond",
-        lat: 1562,
-        long: 1282,
+        lat: 1718,
+        long: 1438,
     },
     {
         name: "reccenter",
-        lat: 1469,
-        long: 2182,
+        lat: 818,
+        long: 1531,
     },
     {
         name: "stadium",
         lat: 600,
-        long: 2500,
+        long: 2700,
     },
     {
         name: "stu",
-        lat: 1681,
-        long: 1411,
+        lat: 1589,
+        long: 1319,
     },
     {
         name: "woo",
-        lat: 1913,
-        long: 941,
+        lat: 2059,
+        long: 1087,
     }
 
 ];
