@@ -1,7 +1,7 @@
 export class Capy {
     constructor(accessory) {
         this.div = document.createElement("div");
-        this.div.style.scale = 0.8;
+        this.div.style.scale = 0.6;
 
         const capyImg = document.createElement("img");
         capyImg.src = "../assets/capys/generic.png";

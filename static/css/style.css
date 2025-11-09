@@ -24,20 +24,20 @@ button:hover {
     fill: rgba(74, 46, 33, 0.5); /* This makes the plus icon fade */
 }
 
+button:hover svg path {
+    opacity: 0.5;
+    transition: fill 0.1s linear !important; 
+}
+
 button[title] {
     overflow: visible; 
 }
 
 button[title]::after {
-    /* Default/initial state for the tooltip */
     content: attr(title); 
     position: absolute;
-    top: 50%; 
-    right: 90%;
-    transform: translateY(-50%); 
     white-space: nowrap; 
     padding: 5px 10px;
-    margin-bottom: 8px; 
     
     background-color: rgb(74, 46, 33); 
     color: rgb(243, 215, 201); 
@@ -46,10 +46,60 @@ button[title]::after {
     font-weight: 400; 
     z-index: 1001;
     
-    /* Key for smooth fade-in */
-    opacity: 0; /* Start hidden */
-    visibility: hidden; /* Hide from screen readers/layout until needed */
-    transition: opacity 0.1s linear, visibility 0.1s linear;
+    /* Default Positioning (Center-Top) */
+    bottom: 100%;       /* Position above the button */
+    left: 50%;         /* Start at 50% from the left */
+    transform: translateX(-50%); /* Center horizontally */
+    margin-bottom: 8px; /* Space above button */
+    
+    /* Fade-in/out effects */
+    opacity: 0; 
+    visibility: hidden; 
+    transition: opacity 0.2s linear, visibility 0.2s linear;
+}
+
+.popup-left button[title]::after {
+    /* Override vertical positioning */
+    top: 50%; 
+    bottom: auto; /* Ensure it overrides any default 'bottom' */
+    
+    /* Set horizontal position */
+    right: 100%; 
+    left: auto; /* Ensure it overrides any default 'left' */
+    
+    /* Center vertically */
+    transform: translateY(-50%); 
+    /* Remove default horizontal centering */
+    
+    margin-right: 8px; /* Space to the left of the button */
+    margin-bottom: auto; /* Remove default bottom margin */
+}
+
+/* Example: Position Right of the button */
+.popup-right button[title]::after {
+    top: 50%; 
+    bottom: auto; 
+    
+    left: 100%; 
+    right: auto;
+    
+    transform: translateY(-50%);
+    
+    margin-left: 8px;
+    margin-bottom: auto; 
+}
+
+.popup-bottom button[title]::after {
+    top: 50%; 
+    bottom: auto; 
+    
+    left: 90%; 
+    right: auto;
+    
+    transform: translateY(-50%);
+    
+    margin-left: 8px;
+    margin-bottom: auto; 
 }
 
 button[title]:hover::after {

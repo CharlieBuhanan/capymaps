@@ -36,24 +36,51 @@ class InteractiveMap {
         this.viewport.addEventListener('touchstart', this.handleTouchStart, { passive: false });
         this.viewport.addEventListener('touchmove', this.handleTouchMove, { passive: false });
         window.addEventListener('touchend', this.handleTouchEnd);
-        
+
+        document.getElementById("recenter-button").addEventListener("click", this.resetView);
+        document.getElementById("zoomin-button").addEventListener("click", () => {
+            this.zoomCenter(1.1);
+        });
+        document.getElementById("zoomout-button").addEventListener("click", () => {
+            this.zoomCenter(0.9);
+        });
+
         // Initial view setup
         this.resetView();
     }
 
     // --- Core Map Logic Methods ---
 
-    updateTransform() {
+    zoomCenter(zoom) {
+        const newScale = this.scale*zoom;
 
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+
+        // The coordinates (X, Y) of the center of the viewport
+        const viewportCenterX = viewportWidth / 2;
+        const viewportCenterY = viewportHeight / 2;
+
+        // Calculate the corresponding point in the map's coordinate system
+        const mapCenterX = (viewportCenterX - this.panX) / this.scale;
+        const mapCenterY = (viewportCenterY - this.panY) / this.scale;
+
+        // Calculate the new pan needed to keep the map center point under the viewport center
+        this.panX = viewportCenterX - mapCenterX * newScale;
+        this.panY = viewportCenterY - mapCenterY * newScale;
         
+        // Apply new scale
+        this.scale = newScale;
+        this.updateTransform();
+    }
+
+    updateTransform() {
         // container.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`; 
         // Use clientWidth/Height for accurate viewport size
-
         this.panX = Math.max(-(this.width+this.bound)*this.scale+window.innerWidth, Math.min(this.bound*this.scale, this.panX));
         this.panY = Math.max(-(this.height+this.bound)*this.scale+window.innerHeight, Math.min(this.bound*this.scale, this.panY));
+        this.scale = Math.max(0.5, Math.min(3.0, this.scale));
         this.container.style.transform = `translate(${this.panX}px, ${this.panY}px) scale(${this.scale})`;
-
-        console.log(this.panX, this.panY, this.scale);
     }
 
     resetView = () => {
