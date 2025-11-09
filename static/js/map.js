@@ -390,3 +390,45 @@ for (let i = 0; i < interactiveMap.width; i += 100) {
 buildingData.forEach(building => {
     new MapBuilding(interactiveMap, building.lat, building.long, building.name);
 });
+
+
+async function loadEvents(n) {
+    console.log("Loading events from backend...");
+    try {
+
+        const response = await fetch("http://localhost:8000/events", {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error(`Backend error: ${response.status}`);
+        }
+
+        const events = await response.json();
+        console.log(`Fetched ${events.length} events from backend.`);
+
+        // Loop through and place each event marker on the map
+        for (let i = 0; i < n; i++) {
+            if (i >= events.length) break;
+            const ev = events[i];
+            // Assuming you have a class like MapEvent similar to MapCapy
+            const alert = new MapAlert(
+                interactiveMap,
+                ev.x_coord + Math.floor(Math.random() * 150) + 50,
+                ev.y_coord + Math.floor(Math.random() * 150) - 50,
+                ev.title,
+                ev.id
+            );
+            alert.zIndex = 100002;
+        }
+        console.log("All event markers placed!");
+
+    } catch (err) {
+        console.error("Failed to load events:", err);
+        alert("Could not load events. Check console for details.");
+    }
+}
+await loadEvents(43);
