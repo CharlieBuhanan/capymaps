@@ -354,7 +354,6 @@ class InteractiveMap {
 
 class MapElement {
     constructor(map, x, y, name, child) {
-        console.log(x, y, name);
         this.x = x;
         this.y = y;
         this.name = name;
