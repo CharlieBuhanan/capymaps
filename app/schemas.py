@@ -21,10 +21,8 @@ class UserCreate(BaseModel):
     def validate_password(cls, v: str):
         if len(v) < 8:
             raise ValueError("Password must be at least 8 characters long")
-            return v
         if len(v) > 128:
             raise ValueError("Password must not exceed 128 characters")
-            return v
         return v
 
 class UserLogin(BaseModel):
@@ -60,7 +58,6 @@ class EventCreate(BaseModel):
     end_time: datetime
     host: str
     location: str
-
     @model_validator(mode="after")
     def check_time(cls, values):
         start, end = values.time, values.end_time
