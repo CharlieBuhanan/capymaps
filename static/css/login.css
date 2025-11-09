@@ -7,7 +7,9 @@ body {
     margin: 0;
 }
 
-#login-container {
+/* Shared container style for both login and signup */
+#login-container,
+#signup-container {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -15,34 +17,42 @@ body {
     padding: 40px 60px;
     border-radius: 20px;
     box-shadow: 0 4px 10px rgba(74, 46, 33, 0.2);
+    background-color: white;
 }
 
-#login-logo {
+/* Shared logo section */
+#login-logo,
+#signup-logo {
     display: flex;
     flex-direction: column;
     align-items: center;
     margin-bottom: 20px;
 }
 
-#login-logo img {
+#login-logo img,
+#signup-logo img {
     height: 80px;
     margin-bottom: 10px;
 }
 
-#login-logo h1 {
+#login-logo h1,
+#signup-logo h1 {
     font-weight: 300;
     font-size: 2em;
     margin: 0;
 }
 
-#login-form {
+/* Shared form styling */
+#login-form,
+#signup-form {
     display: flex;
     flex-direction: column;
     width: 250px;
     gap: 10px;
 }
 
-#login-form input {
+#login-form input,
+#signup-form input {
     padding: 10px;
     border: 1px solid rgba(74, 46, 33, 0.2);
     border-radius: 6px;
@@ -51,11 +61,14 @@ body {
     outline: none;
 }
 
-#login-form input:focus {
+#login-form input:focus,
+#signup-form input:focus {
     border-color: rgb(74, 46, 33);
 }
 
-#login-form button {
+/* Buttons */
+#login-form button,
+#signup-form button {
     background-color: rgb(74, 46, 33);
     color: rgb(243, 215, 201);
     padding: 10px;
@@ -65,23 +78,30 @@ body {
     transition: opacity 0.2s ease;
 }
 
-#login-form button:hover {
+#login-form button:hover,
+#signup-form button:hover {
     opacity: 0.7;
 }
 
-#login-message {
+/* Messages */
+#login-message,
+#signup-message {
     color: rgb(74, 46, 33);
     font-size: 0.9em;
     margin-top: 10px;
     height: 1em;
 }
 
-#login-footer {
+/* Footers */
+#login-footer,
+#signup-footer {
     margin-top: 15px;
     font-size: 0.9em;
+    text-align: center;
 }
 
-#login-footer a {
+#login-footer a,
+#signup-footer a {
     color: rgb(74, 46, 33);
     text-decoration: underline;
 }
