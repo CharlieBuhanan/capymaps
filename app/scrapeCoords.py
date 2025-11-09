@@ -165,5 +165,13 @@ def test():
         if (event.x_coord == -1 or event.y_coord == -1):
             print(f"Failed to normalize coords for event: {event}")
 
+def normalizeAll():
+    normalized = {}
+    for location in longlat:
+        coords = normalizeCoords(location)
+        normalized[location] = coords
+    print(normalized)
+
 if __name__ == "__main__":
-    test()
+    #test()
+    normalizeAll()
