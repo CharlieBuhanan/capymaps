@@ -1,67 +1,39 @@
 from datetime import datetime
+from sqlmodel import Session, select
 from scrapeCoords import EventPrototype, normalizeCoords, scanCapyEvents
+from db import get_session, engine
+from models import Event  # your existing SQLModel table class
 
 
-# --- Your existing pieces assumed to exist ---
-# - months list
-# - EventPrototype class
-# - normalizeCoords()
-# - scanCapyEvents(n)
-
-
-
-# --- Insert logic using the ORM ---
-
-def get_or_create_location(session: Session, name: str):
-    result = session.exec(select(Location).where(Location.name == name)).first()
-    if result:
-        return result
-    coords = normalizeCoords(name)
-    x, y = coords if coords else (-1, -1)
-    loc = Location(name=name, x_coord=x, y_coord=y)
-    session.add(loc)
-    session.commit()
-    session.refresh(loc)
-    return loc
-
-
-def get_or_create_host(session: Session, name: str):
-    result = session.exec(select(Host).where(Host.name == name)).first()
-    if result:
-        return result
-    host = Host(name=name)
-    session.add(host)
-    session.commit()
-    session.refresh(host)
-    return host
-
-
-def insert_events_sqlmodel(events: list[EventPrototype], engine):
-    """Convert EventPrototype objects into SQLModel Event objects and insert."""
-    with Session(engine) as session:
+def insert_events_to_existing_db(events: list[EventPrototype]):
+    """Insert parsed EventPrototype objects into existing SQLModel table 'event'."""
+    with get_session() as session:
         for ev in events:
-            loc = get_or_create_location(session, ev.location)
-            host = get_or_create_host(session, ev.host)
-            event = Event(
+            new_event = Event(
                 id=ev.id,
                 title=ev.title,
+                host=ev.host,
                 description=ev.description,
+                location=ev.location,
+                x_coord=ev.x_coord,
+                y_coord=ev.y_coord,
                 time=ev.time,
                 end_time=ev.end_time,
-                location_id=loc.id,
-                host_id=host.id,
             )
-            session.add(event)
+            """existing = session.exec(select(Event).where(Event.title == ev.title, Event.time == ev.time)).first()
+            if existing:
+                continue  # skip duplicates"""
+            session.add(new_event)
+
+        # Commit inside the 'with' block, while session is open
         session.commit()
 
+    print(f"Inserted {len(events)} events into 'event' table in capy.db.")
 
-# --- Main entry point ---
 
 def main():
-    engine = init_db("sqlite:///capyEvents.db")  # or any other DB URL
-    events = scanCapyEvents(10)
-    insert_events_sqlmodel(events, engine)
-    print(f"Inserted {len(events)} events into SQLModel database.")
+    events = scanCapyEvents(100000)
+    insert_events_to_existing_db(events)
 
 
 if __name__ == "__main__":
