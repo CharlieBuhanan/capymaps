@@ -336,6 +336,7 @@ class MapCapy extends MapElement {
     constructor(map, x, y, accessory, id) {
         const capy = new Capy(accessory);
         super(map, x, y, `${accessory}-capy`, capy.div);
+        this.div.style.zIndex = 10001;
         this.div.classList.add("interactive");
         MapCapy.ids.set(id, this);
     }
