@@ -1,5 +1,6 @@
 from fastapi import Body, FastAPI, Depends, HTTPException, Security, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.middleware.cors import CORSMiddleware
 from sqlmodel import Session, select
 from sqlalchemy import desc
 from datetime import datetime, timedelta
@@ -25,6 +26,14 @@ logger = logging.getLogger("mapybara")
 
 
 app = FastAPI(title="Mapybara")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # for hackathon/dev use — open to all origins
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 bearer_scheme = HTTPBearer()
 
@@ -90,9 +99,10 @@ def get_user_history(username: str, session: Session = Depends(get_session)):
 def add_marker(
     marker: CapybaraMarkerCreate,
     session: Session = Depends(get_session),
-    current_user=Depends(get_current_user_from_token),
 ):
-    return create_marker(session, marker, user_id=current_user.id)
+    # TEMPORARY, UNCOMMENT LATER
+#    return create_marker(session, marker, user_id=current_user.id)
+    return create_marker(session, marker, user_id=1)
 
 @app.get("/markers")
 def get_markers(session: Session = Depends(get_session)):
