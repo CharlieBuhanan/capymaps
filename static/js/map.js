@@ -1,7 +1,5 @@
 import { Capy } from "../js/capy.js";
 
-const capy = new Capy()
-
 const viewport = document.getElementById('map-viewport');
 const container = document.getElementById('map-container');
 
