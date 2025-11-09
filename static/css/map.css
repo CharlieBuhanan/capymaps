@@ -36,14 +36,13 @@ body {
     left: 50%;
     transform: translate(-50%, -20%);
     position: absolute;
-    white-space: nowrap; 
     padding: 5px 10px;
     background-color: rgb(74, 46, 33); 
     color: rgb(243, 215, 201); 
     border-radius: 4px;
     font-size: medium;
     font-weight: 400; 
-    z-index: 1001;
+    z-index: 100001;
 
     opacity: 0; 
     visibility: hidden; 
@@ -53,7 +52,7 @@ body {
 #footer {
     width: 100%;
     position: fixed;
-    z-index: 1000;
+    z-index: 100000;
     bottom: 0;
     padding-bottom: 8px;
     display: flex;
@@ -91,13 +90,16 @@ body {
 }
 
 #create-button {
-    display: flex;
     margin: 0;
-    padding: 4px;
+    padding: 8px;
+    height: 64px;
+    width: 64px;
 }
 
 #create-button * {
-    height: 64px;
-    width: auto;
+    position: absolute;
+    top: 20%;
+    left: 20%;
+    width: 60%;
+    height: 60%;
 }
-

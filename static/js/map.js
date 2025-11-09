@@ -67,8 +67,8 @@ class InteractiveMap {
         this.updateTransform();
     }
 
-    zoomCenter(zoom) {
-        const newScale = this.scale*zoom;
+    zoomCenter(zoomAmount) {
+        const newScale = Math.max(0.5, Math.min(3.0, this.scale * zoomAmount));
 
         const viewportWidth = window.innerWidth;
         const viewportHeight = window.innerHeight;
@@ -94,7 +94,10 @@ class InteractiveMap {
         this.viewport.style.cursor = enable ? "pointer" : "";
         placingCapyPopup.style.opacity = enable ? 1 : 0;
         placingCapyPopup.style.visibility = enable ? "visible" : "hidden";
-        this.placingCapy = enable
+        this.placingCapy = enable;
+        document.getElementById("create-plus-icon").style.visibility = enable ? "hidden" : "visible";
+        document.getElementById("create-exit-icon").style.visibility = enable ? "visible" : "hidden";
+        document.getElementById("create-button").title = enable ? "Stop placing a capybara" : "Place a capybara!";
     }
     
     placeCapy(x, y) {
@@ -233,6 +236,7 @@ class MapElement {
         this.div.style.left = x+"px";
         this.div.style.top = y+"px";
         this.div.appendChild(child);
+        this.div.style.zIndex = y+1000;
         map.container.appendChild(this.div);
     }
 }
@@ -265,16 +269,35 @@ class MapDecor extends MapElement {
         const img = document.createElement("img");
         img.src = `../assets/misc/map-decoration/${decoration}.png`
         img.alt = decoration;
-
+        img.style.scale = 0.2;
+        if (Math.random() > 0.5) {
+            img.style.transform = "scaleX(-1)";
+        }
+        
         super(map, x, y, decoration, img);
     }
 }
 
 class MapCapy extends MapElement {
-    constructor(map, x, y, accessory) {
+    static ids = new Map();
+    constructor(map, x, y, accessory, id) {
         const capy = new Capy(accessory);
         super(map, x, y, `${accessory}-capy`, capy.div);
         this.div.classList.add("interactive");
+        MapCapy.ids.set(id, this);
+    }
+}
+
+class MapAlert extends MapElement {
+    static ids = new Map();
+    constructor(map, x, y, name, id) {
+        const img = document.createElement("img");
+        img.src = `../assets/misc/alert.png`;
+        img.alt = name;
+        super(map, x, y, `${name}-alert`, img);
+        this.div.classList.add("interactive");
+        MapAlert.ids.set(id, this);
+        console.log(MapAlert.ids);
     }
 }
 
@@ -282,7 +305,7 @@ const interactiveMap = new InteractiveMap(3000, 3000);
 
 for (let i = 0; i < interactiveMap.width; i += 100) {
     for (let j = 0; j < interactiveMap.height; j += 100) {
-        if (Math.random() > 0.95) {
+        if (Math.random() > 0.75) {
             new MapDecor(interactiveMap, i + Math.random()*100, j + Math.random()*100);
         }
     }
@@ -291,5 +314,6 @@ for (let i = 0; i < interactiveMap.width; i += 100) {
 new MapBuilding(interactiveMap, 1500, 1500, "dubois");
 new MapBuilding(interactiveMap, 1650, 1450, "ilc");
 
-new MapCapy(interactiveMap, 1500, 1500, "study");
+new MapCapy(interactiveMap, 1500, 1500, "study", 0);
 
+new MapAlert(interactiveMap, 1000, 1000, "awesome", 0);
