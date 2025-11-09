@@ -48,7 +48,7 @@ longlat = {
     "Honors College": [42.38819221356291, -72.53051117860147],
     "Manning": [42.395246017909464, -72.53080788616757], #includes both computer science laboratories
     "Football Stadium": [42.377252931569565, -72.53600655080845], #McGuirk Alumni Stadium
-    "OHill": [42.39188112425516, -72.51923077218746],
+    #"OHill": [42.39188112425516, -72.51923077218746],
     "Old Chapel": [42.3889931002094, -72.52798157448849],
     "Northeast": [42.394813141060865, -72.52489040461563]
 }
@@ -66,8 +66,8 @@ def normalizeCoords(location): # turns lat, long arrays into capy coords, 3000x3
         return None
     lat = round(coords[0],11)
     long = round(coords[1],11)
-    y = 3000-(((lat-42.376) * 10**5)*1.3) 
-    x = -((((long+72.51) * 10**5))*1.6)-1300
+    y = 3000-((lat-42.3742) * 10**5)
+    x = 3000-((-(long+72.52024) * 10**5)*1.9)
     return [round(x), round(y)]
 
 months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
