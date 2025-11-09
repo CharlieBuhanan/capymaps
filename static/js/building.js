@@ -91,8 +91,8 @@ export const buildingData = [
     },
     {
         name: "pond",
-        lat: 1718,
-        long: 1438,
+        lat: 1800,
+        long: 1450,
     },
     {
         name: "reccenter",
