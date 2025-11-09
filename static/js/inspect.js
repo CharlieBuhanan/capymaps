@@ -3,6 +3,7 @@ export class InspectMenu {
 
     constructor(x, y, header, body, content) {
         const main = document.createElement("div");
+        main.style.width = "300px";
 
         main.classList.add("glass", "inspect");
         main.style.left = x+"px";
@@ -30,6 +31,7 @@ export class InspectMenu {
             main.appendChild(content);
         }
 
+        self.div = main;
         document.body.appendChild(main);
         InspectMenu.elements.push(main);
 
@@ -37,6 +39,13 @@ export class InspectMenu {
             main.style.visibility = "visible";
             main.style.opacity = 1;
         });
+    }
+
+    remove() {
+        const div = self.div;
+        div.style.visibility = "hidden";
+        div.style.opacity = 0;
+        setTimeout(() => div.remove(), 1000);
     }
 
     static removeAll() {
