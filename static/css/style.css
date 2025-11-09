@@ -1,6 +1,7 @@
 * {
     font-family: "Momo Trust Sans", sans-serif;
     color: rgb(74, 46, 33);
+    fill: rgb(74, 46, 33);
     font-weight: 300;
 }
 
@@ -12,11 +13,48 @@ body {
 
 button {
     cursor: pointer;
-    transition: opacity 0.1s linear;
+    border: none;
+    transition: color 0.1s linear, background-color 0.1s linear, opacity 0.1s linear, fill 0.1s linear;
+    position: relative; 
+    background-color: transparent;
 }
 
 button:hover {
-    opacity: 0.5;
+    color: rgba(74, 46, 33, 0.5); 
+    fill: rgba(74, 46, 33, 0.5); /* This makes the plus icon fade */
+}
+
+button[title] {
+    overflow: visible; 
+}
+
+button[title]::after {
+    /* Default/initial state for the tooltip */
+    content: attr(title); 
+    position: absolute;
+    top: 50%; 
+    right: 90%;
+    transform: translateY(-50%); 
+    white-space: nowrap; 
+    padding: 5px 10px;
+    margin-bottom: 8px; 
+    
+    background-color: rgb(74, 46, 33); 
+    color: rgb(243, 215, 201); 
+    border-radius: 4px;
+    font-size: small;
+    font-weight: 400; 
+    z-index: 1001;
+    
+    /* Key for smooth fade-in */
+    opacity: 0; /* Start hidden */
+    visibility: hidden; /* Hide from screen readers/layout until needed */
+    transition: opacity 0.1s linear, visibility 0.1s linear;
+}
+
+button[title]:hover::after {
+    opacity: 1;
+    visibility: visible;
 }
 
 .interactive {
@@ -56,7 +94,6 @@ button:hover {
 
 #header * {
     background-color: transparent;
-    border: none;
     height: 100%;
     font-size: large;
 
@@ -81,4 +118,3 @@ button:hover {
 #main {
     margin: 8px;
 }
-
