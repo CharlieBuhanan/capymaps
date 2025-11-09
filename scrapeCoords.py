@@ -1,13 +1,18 @@
+from datetime import datetime, timedelta
+
 longlat = {
     "Campus Center": [42.391732874644994, -72.52696175141477], 
     "Herter": [42.38789103527097, -72.52735983389012],
     "Union": [42.391008373343716, -72.52766653198437],
     "Black Box": [42.391008373343716, -72.52766653198437], # theater, Same as Student Union
+    "BlackBox": [42.391008373343716, -72.52766653198437], # theater, Same as Student Union
+    "Cape Cod": [42.391008373343716, -72.52766653198437], #Same as Student Union
     "Du Bois": [42.38986050847985, -72.52830521146252], 
     "Lot 44": [42.39902629983547, -72.52442471703874], # Sylvan Woods Lot
     "RecWell": [42.388893339150904, -72.53172427493728],
     "New Africa": [42.388978951484276, -72.5206839584861],
     "Goodell": [42.38878200984664, -72.52918860130535],
+    "Malcolm": [42.38878200984664, -72.52918860130535], # same as Goodell
     "Newman": [42.38734314608258, -72.52179600130539],
     "Stonewall": [42.38872654054515, -72.52933880499367],
     "Latinx American Cultural": [42.38293841872035, -72.52976918781037],
@@ -33,6 +38,7 @@ longlat = {
     "Morrill": [42.39094027954138, -72.52404221011663],
     "Isenberg": [42.387339474242, -72.52483184802671],
     "CCPH": [42.385675388811926, -72.52849591573157],
+    "Counseling and Psychological Health": [42.385675388811926, -72.52849591573157], # same as CCPH
     "The House": [42.386293393123054, -72.52029108425877],
     "Fernald": [42.38858307076012, -72.52238824887029],
     "Lederle Graduate Research Center": [42.39392005479079, -72.52769594465809], # LGRC, or ~Science and Engineering Library
@@ -44,12 +50,13 @@ longlat = {
     "Football Stadium": [42.377252931569565, -72.53600655080845] #McGuirk Alumni Stadium
 }
 
-def getCoords(location):
-    if location in longlat:
-        return longlat[location]
-    else:
-        return None
-    
+def getCoords(location: str):
+    """Return coordinates from longlat if location name matches, else None."""
+    for key in longlat:
+        if key.lower() in location.lower():
+            return longlat[key]
+    return None
+
 def normalizeCoords(location): # turns lat, long arrays into capy coords, 3000x3000.
     coords = getCoords(location)
     if coords is None:
@@ -59,6 +66,83 @@ def normalizeCoords(location): # turns lat, long arrays into capy coords, 3000x3
     x = ((lat-42.3742) * 10**5)
     y = (-(long+72.52024) * 10**5)*1.9
     return [round(x), round(y)]
+
+months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+
+class EventPrototype():
+    from datetime import timedelta
+    id: int
+    title: str
+    host: str
+    description: str
+    x_coord: float
+    y_coord: float
+    location: str
+    time: datetime
+    end_time: datetime
+    
+    def __init__(self, id:int, title:str, host:str, description:str, location:str, time:datetime):
+        self.id = id
+        self.title = title
+        self.host = host
+        self.description = description
+        self.location = location
+        self.time = time
+        self.end_time = time + timedelta(hours=2)  # default 2 hour duration
+        coords = normalizeCoords(location)
+        if coords is not None:
+            self.x_coord = coords[0]
+            self.y_coord = coords[1]
+        else:
+            self.x_coord = -1
+            self.y_coord = -1
+    
+    def __repr__(self):
+        return f"EventPrototype(id={self.id}, title={self.title}, host={self.host}, description={self.description}, location={self.location}, time={self.time}, end_time={self.end_time}, x_coord={self.x_coord}, y_coord={self.y_coord})"
+
+
+def parseEvent(lines, start_index, id):
+    #Parse a single event starting at start_index, return (EventPrototype, next_index).
+    title = lines[start_index].strip()
+    date_line = lines[start_index + 1].strip()
+    description = lines[start_index + 2].strip()
+    host = lines[start_index + 3].strip()
+
+    # Example: "Sunday, November 9 at 7:00PM EST"
+    parts = date_line.split(',')
+    day_part = parts[1].strip()  # "November 9 at 7:00PM EST"
+    month, rest = day_part.split(' ', 1)
+    day = int(rest.split(' ')[0])
+    time_str = rest.split('at')[1].split('EST')[0].strip()
+    dt_str = f"{months.index(month)+1}/{day}/2025 {time_str}"
+    time = datetime.strptime(dt_str, "%m/%d/%Y %I:%M%p")
+    
+    location: str = "" # default location is "" if no location given
+    for loc in longlat.keys():
+        if loc.lower() in description.lower(): # find location in description
+            location = loc
+            break
+
+    return EventPrototype(id, title, host, description, location, time), start_index + 4
+
+
+def scanCapyEvents(n:int) -> list[EventPrototype]:
+    events = []
+    with open("CapyEvents.txt", "r", encoding="utf-8") as f:
+        lines = [l for l in f.readlines() if l.strip() != ""]
+    
+    i = 0
+    id = 0
+    while i < len(lines) and len(events) < n:
+        event, i = parseEvent(lines, i, id)
+        if normalizeCoords(event.location):
+            events.append(event)
+
+        # Skip possible blank line separators
+        while i < len(lines) and lines[i].strip() == "":
+            i += 1
+        id += 1
+    return events
 
 def test():
     xs:list[float] = []
@@ -75,7 +159,11 @@ def test():
     #print mean
     print(f"X mean: {sum(xs)/len(xs)}")
     print(f"Y mean: {sum(ys)/len(ys)}")
-
+    
+    events = scanCapyEvents(100000)
+    for event in events: #all events. WHEN TESTING, comment out  if normalizeCoords(event.location) in scanCapyEvents
+        if (event.x_coord == -1 or event.y_coord == -1):
+            print(f"Failed to normalize coords for event: {event}")
 
 if __name__ == "__main__":
     test()
