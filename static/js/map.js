@@ -1,4 +1,5 @@
 import { Capy } from "../js/capy.js";
+import { buildingData } from "../js/building.js";
 
 const viewport = document.getElementById('map-viewport');
 const container = document.getElementById('map-container');
@@ -311,9 +312,6 @@ for (let i = 0; i < interactiveMap.width; i += 100) {
     }
 }
 
-new MapBuilding(interactiveMap, 1500, 1500, "dubois");
-new MapBuilding(interactiveMap, 1650, 1450, "ilc");
-
-new MapCapy(interactiveMap, 1500, 1500, "study", 0);
-
-new MapAlert(interactiveMap, 1000, 1000, "awesome", 0);
+buildingData.forEach(building => {
+    new MapBuilding(interactiveMap, building.lat, building.long, building.name);
+});
