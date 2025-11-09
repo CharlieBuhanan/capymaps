@@ -47,10 +47,10 @@ def select():
     pass
 
 def main():
+    """for i in range(3, 204):
+        deleteEvent(i)
     events = scanCapyEvents(100000)
-    insert_events_to_existing_db(events)
-
-
+    insert_events_to_existing_db(events)"""
 
 if __name__ == "__main__":
     main()
