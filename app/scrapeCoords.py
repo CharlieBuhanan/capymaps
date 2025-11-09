@@ -64,7 +64,7 @@ def normalizeCoords(location): # turns lat, long arrays into capy coords, 3000x3
     lat = round(coords[0],11)
     long = round(coords[1],11)
     x = ((lat-42.3742) * 10**5)
-    y = (-(long+72.52024) * 10**5)*1.9
+    y = 3000-((-(long+72.52024) * 10**5)*1.9)
     return [round(x), round(y)]
 
 months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
@@ -125,14 +125,13 @@ def parseEvent(lines, start_index, id):
 
     return EventPrototype(id, title, host, description, location, time), start_index + 4
 
-
 def scanCapyEvents(n:int) -> list[EventPrototype]:
     events = []
     with open("CapyEvents.txt", "r", encoding="utf-8") as f:
         lines = [l for l in f.readlines() if l.strip() != ""]
     
     i = 0
-    id = 0
+    id = 3
     while i < len(lines) and len(events) < n:
         event, i = parseEvent(lines, i, id)
         if normalizeCoords(event.location):
@@ -173,5 +172,5 @@ def normalizeAll():
     print(normalized)
 
 if __name__ == "__main__":
-    #test()
-    normalizeAll()
+    test()
+    #normalizeAll()

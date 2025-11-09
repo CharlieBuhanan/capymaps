@@ -11,6 +11,7 @@ def insert_events_to_existing_db(events: list[EventPrototype]):
         for ev in events:
             new_event = Event(
                 id=ev.id,
+                user_id=-1,  # assuming -1 for system/userless events
                 title=ev.title,
                 host=ev.host,
                 description=ev.description,
@@ -30,10 +31,25 @@ def insert_events_to_existing_db(events: list[EventPrototype]):
 
     print(f"Inserted {len(events)} events into 'event' table in capy.db.")
 
+def deleteEvent(event_id: int):
+    """Delete an event from the database by its ID."""
+    with get_session() as session:
+        event = session.get(Event, event_id)
+        if event:
+            session.delete(event)
+            session.commit()
+            print(f"Deleted event with ID {event_id}.")
+        else:
+            print(f"No event found with ID {event_id}.")
+
+def select():
+    #TODO implement select
+    pass
 
 def main():
     events = scanCapyEvents(100000)
     insert_events_to_existing_db(events)
+
 
 
 if __name__ == "__main__":
