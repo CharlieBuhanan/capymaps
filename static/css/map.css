@@ -40,15 +40,30 @@ body {
 
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: end;
 }
 
-#footer * {
+#footer * > div {
     border-radius: 100px;
 }
 
 #footer-left {
     padding-left: 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; 
+    align-items: center;
+}
+
+#footer-left * > button {
+    display: flex;
+    margin: 0;
+    padding: 8px;
+}
+
+#footer-left * > button * {
+    height: 32px;
+    width: auto;
 }
 
 #footer-right {
@@ -56,10 +71,9 @@ body {
 }
 
 #create-button {
-    background-color: transparent;
     display: flex;
     margin: 0;
-    padding: 0;
+    padding: 4px;
 }
 
 #create-button * {
@@ -67,7 +81,3 @@ body {
     width: auto;
 }
 
-#create-button:hover svg path {
-    opacity: 0.5;
-    transition: fill 0.1s linear !important; 
-}
