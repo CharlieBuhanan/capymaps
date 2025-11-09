@@ -154,7 +154,7 @@ class InteractiveMap {
             selectedCapy = capy
         };
         
-        for (const accessory of ["generic", "art", "exercise", "sports", "study"]) {
+        for (const accessory of Capy.accessories) {
             const button = document.createElement("button");
             button.style.width = "100px";
             button.style.height = "100px";

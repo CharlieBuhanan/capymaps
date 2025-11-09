@@ -1,4 +1,16 @@
 export class Capy {
+    static accessories = [
+        "generic",
+        "art",
+        "computer",
+        "exercise",
+        "food",
+        "formal",
+        "silly",
+        "sports",
+        "study",
+    ];
+
     constructor(accessory) {
         this.div = document.createElement("div");
         this.accessory = accessory;

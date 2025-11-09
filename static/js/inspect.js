@@ -45,9 +45,7 @@ export class InspectMenu {
         const div = self.div;
         div.style.visibility = "hidden";
         div.style.opacity = 0;
-        setTimeout(() => {
-            div.remove();
-        }, 1000);
+        setTimeout(() => div.remove(), 1000);
     }
 
     static removeAll() {
