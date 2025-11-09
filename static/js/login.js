@@ -35,7 +35,7 @@ form.addEventListener('submit', async (e) => {
         message.style.color = "green";
 
         setTimeout(() => {
-            window.location.href = "./map.html";
+            window.location.href = "/static/html/map.html"; // redirect after login
         }, 800);
     } catch (err) {
         message.textContent = err.message;

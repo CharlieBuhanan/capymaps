@@ -1,6 +1,6 @@
-import { Capy } from "../js/capy.js";
-import { buildingData } from "../js/building.js";
-import { InspectMenu } from "./inspect.js";
+import { Capy } from "/static/js/capy.js";
+import { buildingData } from "/static/js/building.js";
+import { InspectMenu } from "/static/js/inspect.js";
 
 const viewport = document.getElementById('map-viewport');
 const container = document.getElementById('map-container');
@@ -370,7 +370,7 @@ class MapElement {
 class MapBuilding extends MapElement {
     constructor(map, x, y, name) {
         const img = document.createElement("img");
-        img.src = `../assets/buildings/${name}.png`;
+        img.src = `/static/assets/buildings/${name}.png`;
         img.alt = name;
         super(map, x, y, name, img);
         this.div.classList.add("interactive");
@@ -411,7 +411,7 @@ class MapDecor extends MapElement {
         const decoration = MapDecor.decorations[Math.floor(Math.random()*MapDecor.decorations.length)];
 
         const img = document.createElement("img");
-        img.src = `../assets/misc/map-decoration/${decoration}.png`
+        img.src = `/static/assets/misc/map-decoration/${decoration}.png`
         img.alt = decoration;
         if (Math.random() > 0.5) {
             img.style.transform = "scaleX(-1)";
@@ -491,7 +491,7 @@ class MapAlert extends MapElement {
 
     constructor(map, x, y, name, id) {
         const img = document.createElement("img");
-        img.src = `../assets/misc/alert.png`;
+        img.src = `/static/assets/misc/alert.png`;
         img.alt = name;
 
         super(map, x, y, `${name}-alert`, img);

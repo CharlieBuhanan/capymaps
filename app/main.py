@@ -1,12 +1,16 @@
 from fastapi import Body, FastAPI, Depends, HTTPException, Security, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from sqlmodel import Session, select
 from sqlalchemy import desc
 from datetime import datetime, timedelta
 from contextlib import asynccontextmanager
+from pathlib import Path
 import asyncio
 import logging
+import sys
 
 from db import init_db, get_session, engine
 from models import CapybaraMarker, Event, User
@@ -24,8 +28,29 @@ from auth import create_access_token, get_current_user
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("mapybara")
 
+APP_DIR = Path(__file__).resolve().parent
+BASE_DIR = APP_DIR.parent 
+STATIC_DIR = BASE_DIR / "static"
+MAP_HTML_PATH = STATIC_DIR / "html" / "map.html"
 
 app = FastAPI(title="Mapybara")
+
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+
+@app.get("/", summary="Serves the main map.html file")
+async def serve_map_html():
+    """
+    Returns the map.html file as the main page.
+    It uses FileResponse for efficient file serving.
+    """
+    if not MAP_HTML_PATH.exists():
+        # Basic check to ensure the file exists before trying to serve it
+        print(f"Error: Map HTML file not found at {MAP_HTML_PATH}", file=sys.stderr)
+        return {"error": "Internal Server Error - Map file not found"}, 500
+
+    # The media_type is set to text/html so the browser renders it correctly
+    return FileResponse(MAP_HTML_PATH, media_type="text/html")
+
 
 app.add_middleware(
     CORSMiddleware,
