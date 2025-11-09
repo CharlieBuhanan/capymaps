@@ -253,26 +253,47 @@ class MapBuilding extends MapElement {
 }
 
 class MapDecor extends MapElement {
+    static decorations = [
+        // "bush1",
+        // "bush2",
+        // "flower1",
+        // "flower2",
+        // "grass1",
+        // "grass2",
+        // "grass3",
+        // "rock1",
+        "squirrel",
+        "squiggle1",
+        "squiggle2",
+        "squiggle3",
+        "squiggle4",
+        "squiggle5",
+        "squiggle6",
+        "squiggle7",
+        "squiggle8",
+        "squiggle9",
+        "squiggle10",
+        "squiggle11",
+        "squiggle12",
+        "squiggle13",
+        "squiggle14",
+        "squiggle15",
+        "squiggle16",
+        "squiggle17"
+    ];
+
     constructor(map, x, y) {
-        const decorations = [
-            "bush1",
-            "bush2",
-            "flower1",
-            "flower2",
-            "grass1",
-            "grass2",
-            "grass3",
-            "rock1",
-            "squirrel"
-        ]
-        const decoration = decorations[Math.floor(Math.random()*decorations.length)];
+        const decoration = MapDecor.decorations[Math.floor(Math.random()*MapDecor.decorations.length)];
 
         const img = document.createElement("img");
         img.src = `../assets/misc/map-decoration/${decoration}.png`
         img.alt = decoration;
-        img.style.scale = 0.2;
         if (Math.random() > 0.5) {
             img.style.transform = "scaleX(-1)";
+        }
+
+        if (decoration.match(/squiggle/i) && Math.random() > 0.5) {
+            img.style.transform += "scaleY(-1)";
         }
         
         super(map, x, y, decoration, img);
@@ -306,7 +327,7 @@ const interactiveMap = new InteractiveMap(3000, 3000);
 
 for (let i = 0; i < interactiveMap.width; i += 100) {
     for (let j = 0; j < interactiveMap.height; j += 100) {
-        if (Math.random() > 0.75) {
+        if (Math.random() > 0.3) {
             new MapDecor(interactiveMap, i + Math.random()*100, j + Math.random()*100);
         }
     }
