@@ -17,7 +17,7 @@ form.addEventListener('submit', (e) => {
         message.textContent = "Login successful!";
         message.style.color = "green";
         setTimeout(() => {
-            window.location.href = "./map.html"; // redirect after login
+            window.location.href = "/static/html/map.html"; // redirect after login
         }, 800);
     } else {
         message.textContent = "Invalid credentials.";

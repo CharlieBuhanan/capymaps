@@ -20,7 +20,7 @@ export class Capy {
         this.accessory = accessory;
 
         const capyImg = document.createElement("img");
-        capyImg.src = "../assets/capys/generic.png";
+        capyImg.src = "/static/assets/capys/generic.png";
         capyImg.alt = `${accessory} capybara`;
         capyImg.style.position = "absolute";
         capyImg.style.transform = "translate(-100%, -100%)";
@@ -28,7 +28,7 @@ export class Capy {
 
         if (accessory !== "generic") {
             const accessoryImg = document.createElement("img");
-            accessoryImg.src = `../assets/accessories/${accessory}.png`;
+            accessoryImg.src = `/static/assets/accessories/${accessory}.png`;
             accessoryImg.style.position = "absolute";
             accessoryImg.style.transform = "translate(-100%, -100%)";
             this.div.appendChild(accessoryImg);
