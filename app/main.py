@@ -24,13 +24,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("mapybara")
 
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    init_db()
-    asyncio.create_task(cleanup_task())
-    yield
-
-app = FastAPI(title="Mapybara", lifespan=lifespan)
+app = FastAPI(title="Mapybara")
 
 bearer_scheme = HTTPBearer()
 
@@ -216,17 +210,27 @@ def delete_event(
 # Cleanup Task to remove Dead Capybaras and Finished Events
 # ---------------------------------------------------------
 
-async def cleanup_task():
+async def cleanup_task(stop_event: asyncio.Event):
     """Periodically delete expired markers every 30 minutes."""
-    while True:
+    while not stop_event.is_set():
         try:
-            await asyncio.sleep(1800)  # 30 minutes
+            await asyncio.sleep(1800)
             with Session(engine) as session:
                 deleted_markers = delete_expired_markers(session, datetime.now())
                 deleted_events = delete_finished_events(session, datetime.now())
                 if deleted_markers or deleted_events:
-                    logger.info(f"[Cleanup] Removed {deleted_markers} expired capybaras and "
-                                f"{deleted_events} finished events at {datetime.now()}")
+                    logger.info(f"[Cleanup] Removed {deleted_markers} markers and {deleted_events} events")
         except Exception as e:
-            logger.error(f"[Cleanup] Error during cleanup: {e}")
+            logger.error(f"[Cleanup] Error: {e}")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    init_db()
+    stop_event = asyncio.Event()
+    task = asyncio.create_task(cleanup_task(stop_event))
+    logger.info("Background cleanup task started.")
+    yield
+    stop_event.set()
+    task.cancel()
+    logger.info("Background cleanup task stopped.")
 
