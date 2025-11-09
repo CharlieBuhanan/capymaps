@@ -2,19 +2,9 @@ from enum import Enum
 
 class ActivityEnum(str, Enum):
     generic = "generic"
-    studying = "studying"
-    eating = "eating"
-    onMyPuter = "computer"
-    finals = "finals"
-    GYM = "GYM"
-    umassCapy = "umass capy"
-    gameDayCapy = "game day capy"
-    bakeSaleCapy = "bake sale capy"
-
-class LocationEnum(str, Enum):
-    library = "Library"
-    worcesterDC = "Worcester Commons"
-    theRec = "Recreation Center"
-    LGRT = "Lederle Graduate Research Tower"
-    theStu = "Student Union"
-    
+    study = "study"
+    food = "food"
+    computer = "computer"
+    art = "art"
+    sports = "sports"
+    formal = "formal"    
