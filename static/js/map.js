@@ -387,7 +387,7 @@ class MapDecor extends MapElement {
         // "grass2",
         // "grass3",
         // "rock1",
-        "squirrel",
+        // "squirrel",
         "squiggle1",
         "squiggle2",
         "squiggle3",
@@ -498,8 +498,9 @@ class MapAlert extends MapElement {
         this.id = id;
         this.name = name;
         this.type = "alert";
-
+        this.div.style.zIndex = 10002;
         this.div.classList.add("interactive");
+
         MapAlert.ids.set(id, this);
         const self = this;
         this.div.addEventListener("click", (event) => {
@@ -605,6 +606,8 @@ async function loadEvents(n) {
             throw new Error(`Backend error: ${response.status}`);
         }
 
+
+        
         const events = await response.json();
         console.log(`Fetched ${events.length} events from backend.`);
 
@@ -615,12 +618,11 @@ async function loadEvents(n) {
             // Assuming you have a class like MapEvent similar to MapCapy
             const alert = new MapAlert(
                 interactiveMap,
-                ev.x_coord + Math.floor(Math.random() * 150) + 50,
-                ev.y_coord + Math.floor(Math.random() * 150) - 50,
+                ev.x_coord + Math.floor(Math.random() * 100) - 50,
+                ev.y_coord + Math.floor(Math.random() * 100) - 50,
                 ev.title,
                 ev.id
             );
-            alert.zIndex = 100002;
         }
         console.log("All event markers placed!");
 
@@ -629,4 +631,4 @@ async function loadEvents(n) {
         alert("Could not load events. Check console for details.");
     }
 }
-await loadEvents(43);
+loadEvents(43);

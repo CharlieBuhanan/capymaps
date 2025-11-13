@@ -32,7 +32,7 @@ APP_DIR = Path(__file__).resolve().parent
 BASE_DIR = APP_DIR.parent 
 STATIC_DIR = BASE_DIR / "static"
 MAP_HTML_PATH = STATIC_DIR / "html" / "map.html"
-LOGIN_HTML_PATH = STATIC_DIR / "html" / "login.html"
+LOGIN_HTML_PATH = STATIC_DIR / "html/login.html"
 SIGNUP_HTML_PATH = STATIC_DIR / "html" / "signup.html"
 
 app = FastAPI(title="Mapybara")
@@ -53,8 +53,8 @@ async def serve_login():
         return {"error": "Internal Server Error - file not found"}, 500
     return FileResponse(LOGIN_HTML_PATH, media_type="text/html")
 
-@app.get("/sign-up")
-async def serve_login():
+@app.get("/signup")
+async def serve_signup():
     if not SIGNUP_HTML_PATH.exists():
         print(f"Error: HTML file not found at {SIGNUP_HTML_PATH}", file=sys.stderr)
         return {"error": "Internal Server Error - file not found"}, 500
@@ -170,7 +170,7 @@ def update_marker(
         reset_timer = True
 
     if reset_timer:
-        capy.expires_at = datetime.now() + timedelta(hours=4)
+        capy.expires_at = datetime.now() + timedelta(minutes=1)
 
     session.add(capy)
     session.commit()
@@ -258,7 +258,7 @@ async def cleanup_task(stop_event: asyncio.Event):
     """Periodically delete expired markers every 30 minutes."""
     while not stop_event.is_set():
         try:
-            await asyncio.sleep(1800)
+            await asyncio.sleep(30) 
             with Session(engine) as session:
                 deleted_markers = delete_expired_markers(session, datetime.now())
                 deleted_events = delete_finished_events(session, datetime.now())

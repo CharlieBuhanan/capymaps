@@ -37,7 +37,7 @@ def authenticate_user(session: Session, username: str, password: str):
 # ----------------
 
 def create_marker(session: Session, marker: CapybaraMarkerCreate, user_id: int):
-    expires_at = datetime.now() + timedelta(hours=4)
+    expires_at = datetime.now() + timedelta(minutes=1)
     db_marker = CapybaraMarker(x_coord=marker.x_coord,
         y_coord=marker.y_coord,
         activity=marker.activity,

@@ -2,7 +2,7 @@ from datetime import datetime
 from sqlmodel import Session, select
 from scrapeCoords import EventPrototype
 from db import get_session, engine
-from models import Event  # your existing SQLModel table class
+from models import Event, CapybaraMarker  # your existing SQLModel table class
 
 #THESE DO NOT WORK IF @contextmanager IS NOT USED IN db.py FOR get_session(). REVERT WHEN NOT IN USE.
 def insert_events_to_existing_db(events: list[EventPrototype]):
@@ -42,7 +42,18 @@ def deleteEvent(event_id: int):
         else:
             print(f"No event found with ID {event_id}.")
 
-def select(event_id: int):
+def deleteCapy(capy_id: int):
+    """Delete an event from the database by its ID."""
+    with get_session() as session:
+        capy = session.get(CapybaraMarker, capy_id)
+        if capy:
+            session.delete(capy)
+            session.commit()
+            print(f"Deleted event with ID {capy_id}.")
+        else:
+            print(f"No event found with ID {capy_id}.")
+
+def selectEvent(event_id: int):
     with get_session() as session:
         event = session.get(Event, event_id)
         if event:
@@ -53,10 +64,9 @@ def select(event_id: int):
             print(f"No event found with ID {event_id}.")
 
 def main():
-    for i in range(3, 4):
-        print(select(i))
+    for i in range(4, 39):
+        deleteCapy(i)
 
-    
     """for i in range(3, 204):
         deleteEvent(i)
     events = scanCapyEvents(100000)
